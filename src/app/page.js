@@ -30,7 +30,8 @@ export default function Home() {
 
   return (
     <main>
-      <h1>Howler</h1>
+      <h1 className='site-title'>Howler</h1>
+      <div className="divider" />
       {backendUser?.authenticated ? (
         <div className='welcome'>
           <p>✅ Email: <strong>{backendUser.email}</strong></p>
