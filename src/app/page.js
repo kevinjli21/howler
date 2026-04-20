@@ -1,25 +1,49 @@
-'use client'
-import { createClient } from '@/utils/supabase/client'
+'use client';
+import { useEffect, useState } from 'react';
+import LoginButton from './components/LoginButton';
+import LogoutButton from './components/LogoutButton';
 
-export default function Login() {
-  const supabase = createClient()
+export default function Home() {
+  const [backendUser, setBackendUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const signInWithGoogle = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-  }
+  useEffect(() => {
+    async function checkBackendAuth() {
+      try {
+        // We aren't using the supabase client here! 
+        // We are asking our OWN server if we are logged in.
+        const res = await fetch('/api/auth');
+        if (res.ok) {
+          const data = await res.json();
+          setBackendUser(data);
+        }
+      } catch (err) {
+        console.error("Backend check failed", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    checkBackendAuth();
+  }, []);
+
+  if (loading) return <p>Refreshing page...</p>;
 
   return (
-    <div>
-      <h1>Welcome To Howler</h1>
-      <h2>Please sign in with your UW email</h2>
-      <button onClick={signInWithGoogle} style={{ cursor: 'pointer', textDecoration: 'underline' }}>
-        Sign in with Google
-      </button>
-    </div>
-  )
+    <main>
+      <h1>Howler</h1>
+      {backendUser?.authenticated ? (
+        <div className='welcome'>
+          <p>✅ Email: <strong>{backendUser.email}</strong></p>
+          <p>Name: {backendUser.name}</p>
+          <LogoutButton />
+        </div>
+      ) : (
+        <div className='welcome'>
+          <p>❌ Not logged in</p>
+          <p>Please log in with your UW Google account.</p>
+          <LoginButton />
+        </div>
+      )}
+    </main>
+  );
 }

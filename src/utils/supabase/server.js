@@ -8,6 +8,11 @@ export const createClient = async () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL,
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
+      auth: {
+        flowType: 'pkce',
+        detectSessionInUrl: false,
+        persistSession: true,
+      },
       cookies: {
         getAll() {
           return cookieStore.getAll();
@@ -18,7 +23,7 @@ export const createClient = async () => {
               cookieStore.set(name, value, options)
             );
           } catch {
-            // This is expected when calling setAll from a Server Component
+            // Expected in Server Components
           }
         },
       },
