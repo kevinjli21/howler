@@ -40,8 +40,8 @@ export default function Home() {
         </div>
       ) : (
         <div className='welcome'>
-          <p>❌ Not logged in</p>
-          <p>Please log in with your UW Google account.</p>
+
+          <p className='instructions'>Please log in with your UW Google account.</p>
           <LoginButton />
         </div>
       )}
