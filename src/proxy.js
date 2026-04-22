@@ -38,7 +38,7 @@ export async function proxy(request) {
   // to refresh the session if it's expired.
   await supabase.auth.getUser()
 
-  return response
+  return response;
 }
 
 export const config = {

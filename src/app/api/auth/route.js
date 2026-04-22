@@ -15,6 +15,8 @@ export async function GET() {
     authenticated: true,
     email: user.email,
     name: user.user_metadata?.name,
-    id: user.id
+    id: user.id,
+    image: user.user_metadata?.image,
+    avatar: user.user_metadata?.avatar_url
   });
 }

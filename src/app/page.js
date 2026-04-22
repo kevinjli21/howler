@@ -1,20 +1,21 @@
 'use client';
 import { useEffect, useState } from 'react';
 import LoginButton from './components/LoginButton';
-import LogoutButton from './components/LogoutButton';
+import PostModal from './components/PostModal';
+import CreatePostForm from './components/CreatePostForm';
+import UserDropdown from './components/UserDropdown';
 
 export default function Home() {
   const [backendUser, setBackendUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
     async function checkBackendAuth() {
       try {
-        // We aren't using the supabase client here! 
-        // We are asking our OWN server if we are logged in.
         const res = await fetch('/api/auth');
         if (res.ok) {
           const data = await res.json();
+          console.log("Backend auth check response:", data);
           setBackendUser(data);
         }
       } catch (err) {
@@ -30,21 +31,42 @@ export default function Home() {
 
   return (
     <main>
-      <h1 className='site-title'>Howler</h1>
-      <div className="divider" />
       {backendUser?.authenticated ? (
-        <div className='welcome'>
-          <p>✅ Email: <strong>{backendUser.email}</strong></p>
-          <p>Name: {backendUser.name}</p>
-          <LogoutButton />
+        <div className='signed-in'>
+          <h1 className='signed-in-title'>Howler</h1>
+          
+          <header className='user-info'>
+            <button 
+              className="create-post-btn"
+              onClick={() => setIsModalOpen(true)}
+            >
+              Howl
+            </button>
+            <img src={backendUser.avatar} alt="Profile" className='profile-pic' />
+            <UserDropdown username={backendUser.name} />
+          </header>
         </div>
       ) : (
-        <div className='welcome'>
-
-          <p className='instructions'>Please log in with your UW Google account.</p>
-          <LoginButton />
+        <div className='signed-out'>
+          <h1 className='site-title'>Howler</h1>
+          <div className="divider" />
+          <div className='welcome'>
+            <p className='instructions'>Please log in with your UW Google account.</p>
+            <LoginButton />
+          </div>
         </div>
       )}
+      <PostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <CreatePostForm 
+          onPostCreated={() => {
+              setIsModalOpen(false);
+              window.location.reload(); // Only reload on success
+          }}
+          onCancel={() => {
+              setIsModalOpen(false); // Just close the modal, no refresh
+          }}
+        />
+      </PostModal>
     </main>
   );
 }
