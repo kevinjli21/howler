@@ -8,7 +8,6 @@ export default function LoginButton() {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // Since everything is on page.js, redirect back to home
         redirectTo: `${window.location.origin}/auth/callback?next=/`,
       },
     });

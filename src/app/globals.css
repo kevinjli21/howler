@@ -259,7 +259,7 @@ body {
 }
 
 .post-textarea {
-  width: 100%;
+  width: 95%;
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
@@ -317,4 +317,42 @@ body {
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Hide the default input */
+.hidden-input {
+  display: none;
+}
+
+/* Style the label to look like a button */
+.file-upload-label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border: 1px solid #d1d5db;
+  transition: background-color 0.2s;
+}
+
+.file-upload-label:hover {
+  background-color: #e5e7eb;
+}
+
+/* Show file name when selected */
+.file-name {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+}
+
+.error-message {
+  color: #dc2626; /* Red color */
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  background-color: #fee2e2;
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
