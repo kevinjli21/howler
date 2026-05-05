@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 export async function GET() {
   const supabase = await createClient();
   
-  // This is the moment of truth for your backend routing
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error || !user) {

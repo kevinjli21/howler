@@ -4,6 +4,8 @@ import LoginButton from './components/LoginButton';
 import PostModal from './components/PostModal';
 import CreatePostForm from './components/CreatePostForm';
 import UserDropdown from './components/UserDropdown';
+import PostFeed from './components/PostFeed';
+import Link from 'next/link';
 
 export default function Home() {
   const [backendUser, setBackendUser] = useState(null);
@@ -25,16 +27,18 @@ export default function Home() {
       }
     }
     checkBackendAuth();
-  }, []);
+  }, []); // Check for auth from backend when initially loading
 
   if (loading) return <p>Refreshing page...</p>;
 
   return (
+    // Logged in view
     <main>
       {backendUser?.authenticated ? (
         <div className='signed-in'>
-          <h1 className='signed-in-title'>Howler</h1>
-          
+          <h1 className='signed-in-title'><Link className='site-title-link' href="/">
+            Howler
+          </Link></h1>
           <header className='user-info'>
             <button 
               className="create-post-btn"
@@ -45,8 +49,12 @@ export default function Home() {
             <img src={backendUser.avatar} alt="Profile" className='profile-pic' />
             <UserDropdown username={backendUser.name} />
           </header>
+          <div className='post-section'>
+            <PostFeed />
+          </div>
         </div>
       ) : (
+        // Logged out view
         <div className='signed-out'>
           <h1 className='site-title'>Howler</h1>
           <div className="divider" />

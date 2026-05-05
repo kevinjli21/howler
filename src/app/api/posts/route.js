@@ -1,16 +1,46 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
+export async function GET(request) {
+  const supabase = await createClient();
+  const { searchParams } = new URL(request.url);
+  
+  const page = parseInt(searchParams.get('page') || '1');
+  const categoryId = searchParams.get('categoryId'); // New: get category filter
+  const limit = 10;
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  let query = supabase
+    .from('posts')
+    .select(`
+      *, 
+      profiles (full_name, avatar_url, username),
+      categories (category_name, color),
+      comments(count),
+      likes(count)
+    `)
+    .order('posted_at', { ascending: false })
+    .range(from, to);
+
+  if (categoryId) {
+    query = query.eq('category_id', categoryId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
 export async function POST(req) {
   const supabase = await createClient();
 
-  // 1. Authenticate
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  // 2. Parse FormData
   const formData = await req.formData();
   const content = formData.get('content');
   const categoryId = formData.get('category_id');
@@ -18,9 +48,8 @@ export async function POST(req) {
 
   let imageUrl = null;
 
-  // 3. Handle File Upload (if exists)
   if (file && file.size > 0) {
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; 
     if (file.size > MAX_FILE_SIZE) {
       return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 413 });
     }
@@ -46,7 +75,6 @@ export async function POST(req) {
     imageUrl = publicUrlData.publicUrl;
   }
 
-  // 4. Insert into Database
   const { data, error: dbError } = await supabase
     .from('posts')
     .insert([

@@ -4,10 +4,10 @@ import { useState, useEffect } from 'react';
 export default function CreatePostForm({ onPostCreated, onCancel }) {
   const [content, setContent] = useState('');
   const [categories, setCategories] = useState([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(''); // Empty string initially
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(''); // State for error messages
+  const [error, setError] = useState(''); 
 
   useEffect(() => {
     async function fetchCategories() {
@@ -22,15 +22,13 @@ export default function CreatePostForm({ onPostCreated, onCancel }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
-
-    // 1. Requirement: Require category selection
+    setError('');
+     /* Error Handling */
     if (!selectedCategoryId) {
       setError('Please select a category.');
       return;
     }
 
-    // 2. Requirement: Strict file check ONLY if a file exists
     if (file && !file.type.startsWith('image/')) {
       setError('Invalid file type. Please upload an image.');
       return;
@@ -83,7 +81,7 @@ export default function CreatePostForm({ onPostCreated, onCancel }) {
         onChange={(e) => setSelectedCategoryId(e.target.value)} 
         className="category-select"
       >
-        <option value="">Select a Category Tag</option> {/* Placeholder */}
+        <option value="">Select a Category Tag</option>
         {categories.map((cat) => (
           <option key={cat.id} value={cat.id}>{cat.category_name}</option>
         ))}

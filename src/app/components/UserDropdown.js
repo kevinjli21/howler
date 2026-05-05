@@ -2,12 +2,12 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/client'; // Import this
+import { createClient } from '@/utils/supabase/client'; 
 
 export default function UserDropdown({ username }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const supabase = createClient(); // Initialize Supabase here
+  const supabase = createClient(); 
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -19,7 +19,6 @@ export default function UserDropdown({ username }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Use the same hard-refresh logic we agreed on
   const handleLogout = async () => {
     await supabase.auth.signOut();
     window.location.assign('/'); 
@@ -41,7 +40,7 @@ export default function UserDropdown({ username }) {
 
       {isOpen && (
         <div className="dropdown-menu">
-            <Link href="/profile" className="dropdown-item">
+            <Link href="/my-profile" className="dropdown-item">
             My Profile
             </Link>
             <Link href="/settings" className="dropdown-item">
