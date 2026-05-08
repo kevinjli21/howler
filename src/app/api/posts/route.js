@@ -6,7 +6,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   
   const page = parseInt(searchParams.get('page') || '1');
-  const categoryId = searchParams.get('categoryId'); // New: get category filter
+  const categoryId = searchParams.get('categoryId'); 
   const limit = 10;
   const from = (page - 1) * limit;
   const to = from + limit - 1;

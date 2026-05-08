@@ -40,7 +40,7 @@ const { data, error } = await supabase
     campus_id 
 })
 .eq('id', user.id)
-.select(`*, campus(name)`) // Select the join again so the UI updates immediately
+.select(`*, campus(name)`) 
 .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
