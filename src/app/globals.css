@@ -104,7 +104,7 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 12rem;
-  height: 3.5rem;
+  height: 64px;
   padding: 0.6rem 1rem;
   background-color: #ffffff;
   border: 1px solid #e5e7eb;
@@ -323,6 +323,7 @@ body {
   border-radius: 0.5rem;
   font-weight: 600;
   cursor: pointer;
+  height: 64px;
 }
 
 .hidden-input {
@@ -473,13 +474,17 @@ body {
 }
 
 .filter-menu {
-
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   padding: 1rem;
-  border-bottom: 1px solid #efefef;
-  background: white;
+  margin-bottom: 2rem;
+  background: rgba(255, 255, 255, 0.7); 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
 }
 
 .filter-menu button {
@@ -608,19 +613,18 @@ body {
   align-items: center;
   justify-content: space-between; 
   padding: 10px 20px;
-  border-bottom: 1px solid #efefef;
   position: static;
   height: 60px;
 }
 
 /* 1. Keep the logo on the left */
 .logo-container {
-  flex: 0 0 150px; /* Doesn't grow or shrink */
+  flex: 1; /* Doesn't grow or shrink */
 }
 
 /* 2. The Center Piece */
 .search-container {
-  flex: 1; /* Grows to fill middle space */
+  flex: 2; /* Grows to fill middle space */
   display: flex;
   justify-content: center; /* Centers the search bar itself */
 }
@@ -645,8 +649,152 @@ body {
 
 /* 3. Keep User Info on the right */
 .user-info-container {
-  flex: 0 0 150px; 
+  flex: 1; /* Match the left side exactly */
   display: flex;
   justify-content: flex-end;
-  position: static;
+  align-items: center; /* Ensures Y-axis alignment for button/avatar */
+  gap: 20px;
+}
+
+.search-page-layout {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.results-heading {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: lightgrey; /* Deep near-black for maximum clarity */
+  margin-bottom: 30px;
+}
+
+.search-results-section {
+  margin-bottom: 45px;
+}
+
+.search-results-section h2 {
+  color: #1a1a1a; 
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  
+  margin-bottom: 20px;
+  padding-bottom: 8px;
+  border-bottom: 3px solid #4b2e83; 
+  display: inline-block; 
+}
+
+.search-user-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  border: 1px solid #efefef;
+  border-radius: 12px;
+  background: #fff;
+  transition: box-shadow 0.2s ease;
+}
+
+.search-user-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #ddd;
+}
+
+.search-user-card .full-name {
+  color: #000; /* Pure black for names */
+  font-weight: 700;
+  margin: 0;
+}
+
+.search-user-card .username {
+  color: #536471; /* Muted gray for handles */
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.no-results-text {
+  color: lightgrey;
+  font-size: 0.95rem;
+  padding: 10px 0;
+}
+
+/* --- Post Card Container --- */
+.post-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  padding: 15px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  /* Removes default link behaviors if you wrap this in a Link later */
+  text-decoration: none; 
+  cursor: default;
+}
+
+/* --- Header & Y-Axis Alignment --- */
+.post-header {
+  display: flex;
+  align-items: center; /* This is the magic y-axis fix */
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0; /* Prevents avatar from squishing */
+}
+
+.post-author-details {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2; /* Tightens the gap between Name and @Handle */
+}
+
+.post-author-details strong {
+  font-size: 1rem;
+  color: #0f1419;
+}
+
+.post-username {
+  color: #536471;
+  font-size: 0.85rem;
+}
+
+
+.post-content-text {
+  margin: 10px 0; 
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #0f1419;
+  word-wrap: break-word;
+}
+
+.post-image-container {
+  margin-top: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #eee;
+  display: block;
+}
+
+.post-image-main {
+  width: 100%;
+  height: 300px; 
+  object-fit: cover;
+  object-position: top; 
+  display: block;
+}
+
+/* --- Timestamp --- */
+.post-date-stamp {
+  display: block;
+  margin-top: 8px;
+  color: #666;
+  font-size: 0.8rem;
 }

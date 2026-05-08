@@ -6,6 +6,7 @@ import CreatePostForm from './components/CreatePostForm';
 import UserDropdown from './components/UserDropdown';
 import PostFeed from './components/PostFeed';
 import Link from 'next/link';
+import { getAvatarUrl } from '@/utils/helpers';
 
 export default function Home() {
   const [backendUser, setBackendUser] = useState(null);
@@ -31,6 +32,13 @@ export default function Home() {
 
   if (loading) return <p>Refreshing page...</p>;
 
+const handleSearch = (e) => {
+  if (e.key === 'Enter') {
+    const query = e.target.value;
+    window.location.href = `/search?q=${encodeURIComponent(query)}`;
+  }
+};
+
   return (
     // Logged in view
     <main>
@@ -43,7 +51,7 @@ export default function Home() {
               </Link></h1>
             </div>
             <div className='search-container'>
-              <input type="text" placeholder="Search for posts or users..." className='search-bar' />
+              <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
             </div>
             <div className='user-info-container'>
                 <button 
@@ -52,7 +60,7 @@ export default function Home() {
                 >
                   Howl
                 </button>
-                <img src={backendUser.avatar} alt="Profile" className='profile-pic' />
+                <img src={getAvatarUrl(backendUser.avatar)} alt="Profile" className='profile-pic' />
                 <UserDropdown username={backendUser.name} />
             </div>
           </nav>

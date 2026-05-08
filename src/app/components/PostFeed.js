@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import CategoryFilter from './CategoryFilter';
+import { getAvatarUrl } from '@/utils/helpers';
 
 const LIMIT = 10;
 
@@ -72,7 +73,7 @@ export default function PostFeed() {
               <div className="post-header">
                 {post.profiles?.avatar_url && (
                   <img 
-                    src={post.profiles.avatar_url} 
+                    src={getAvatarUrl(post.profiles.avatar_url)} 
                     alt={post.profiles.full_name || 'User avatar'} 
                     className="avatar-img"
                   />

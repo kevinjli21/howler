@@ -1,6 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import UserDropdown from '../components/UserDropdown';
+import { getAvatarUrl } from '@/utils/helpers';
 
 export default function MyProfile() {
     const [backendUser, setBackendUser] = useState(null);
@@ -13,6 +15,7 @@ export default function MyProfile() {
         bio: '',
         campus_id: ''
     });
+
 
     useEffect(() => {
         async function fetchProfileAndCampuses() {
@@ -44,6 +47,7 @@ export default function MyProfile() {
         }
         fetchProfileAndCampuses();
     }, []);
+    
 
     const handleSave = async () => {
         setLoading(true);
@@ -66,16 +70,49 @@ export default function MyProfile() {
         }
     };
 
+    const handleSearch = (e) => {
+        if (e.key === 'Enter') {
+            const query = e.target.value;
+            window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        }
+    };
+
+    if (!backendUser) return <div className="search-page-layout">Verifying session...</div>;
+    if (loading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+                <p>Loading your UW Howler profile...</p>
+            </div>
+        );
+    }
+
 
     return (
         <div>
-            <h1 className='signed-in-title'><Link className='site-title-link' href="/">
-            Howler
-          </Link></h1>
+            <nav className='navbar'>
+            <div className='logo-container'>
+              <h1 className='signed-in-title'><Link className='site-title-link' href="/">
+                Howler
+              </Link></h1>
+            </div>
+            <div className='search-container'>
+              <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
+            </div>
+            <div className='user-info-container'>
+                <button 
+                  className="create-post-btn"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Howl
+                </button>
+                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
+                <UserDropdown username={backendUser.full_name} />
+            </div>
+          </nav>
             <div className="my-profile-container">
                 <div className="profile-header">
                     {backendUser?.avatar_url && (
-                        <img src={backendUser.avatar_url} alt="Avatar" className="profile-avatar-large" />
+                        <img src={getAvatarUrl(backendUser.avatar_url)} alt="Avatar" className="profile-avatar-large" />
                     )}
                     <div className="profile-meta">
                         <h1>{backendUser?.full_name}</h1>
