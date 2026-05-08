@@ -51,7 +51,7 @@ export default function PostFeed() {
       <section className="feed-container">
         {!loading && posts.length === 0 ? (
           <div className="no-posts-message">
-            <p>No posts found in this category yet. Be the first to howl!</p>
+            <p>No posts found in this category yet.</p>
           </div>
         ) : (
           posts.map((post) => (

@@ -36,19 +36,26 @@ export default function Home() {
     <main>
       {backendUser?.authenticated ? (
         <div className='signed-in'>
-          <h1 className='signed-in-title'><Link className='site-title-link' href="/">
-            Howler
-          </Link></h1>
-          <header className='user-info'>
-            <button 
-              className="create-post-btn"
-              onClick={() => setIsModalOpen(true)}
-            >
-              Howl
-            </button>
-            <img src={backendUser.avatar} alt="Profile" className='profile-pic' />
-            <UserDropdown username={backendUser.name} />
-          </header>
+          <nav className='navbar'>
+            <div className='logo-container'>
+              <h1 className='signed-in-title'><Link className='site-title-link' href="/">
+                Howler
+              </Link></h1>
+            </div>
+            <div className='search-container'>
+              <input type="text" placeholder="Search for posts or users..." className='search-bar' />
+            </div>
+            <div className='user-info-container'>
+                <button 
+                  className="create-post-btn"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Howl
+                </button>
+                <img src={backendUser.avatar} alt="Profile" className='profile-pic' />
+                <UserDropdown username={backendUser.name} />
+            </div>
+          </nav>
           <div className='post-section'>
             <PostFeed />
           </div>

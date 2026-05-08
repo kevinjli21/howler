@@ -8,7 +8,6 @@ export default function MyProfile() {
     const [isEditing, setIsEditing] = useState(false);
     const [campuses, setCampuses] = useState([]); // State to store all campus options
 
-    // Form state updated to include campus_id
     const [formData, setFormData] = useState({
         username: '',
         bio: '',

@@ -1,12 +1,13 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 
+// GET handler for fetching posts with pagination and optional category filtering
 export async function GET(request) {
   const supabase = await createClient();
   const { searchParams } = new URL(request.url);
   
   const page = parseInt(searchParams.get('page') || '1');
-  const categoryId = searchParams.get('categoryId'); // New: get category filter
+  const categoryId = searchParams.get('categoryId'); 
   const limit = 10;
   const from = (page - 1) * limit;
   const to = from + limit - 1;
@@ -33,6 +34,8 @@ export async function GET(request) {
   return NextResponse.json(data);
 }
 
+
+// POST handler for creating a new post with optional image upload
 export async function POST(req) {
   const supabase = await createClient();
 

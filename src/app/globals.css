@@ -64,6 +64,7 @@ body {
   color: #b7a57a;
   padding-left: 2rem;
   margin-top: 0;
+  padding-top: 28px;
 }
 
 .user-info {
@@ -72,7 +73,7 @@ body {
   top: 0;
   right: 0;
   padding-right: 50px;
-  padding-top: 30px;
+  padding-top: 20px;
   gap: 24px;
 }
 
@@ -601,3 +602,51 @@ body {
 .save-btn { background: #4b2e83; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-right: 10px; margin-top: 15px; }
 .cancel-btn { background: #eee; color: #333; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer; margin-top: 15px; }
 .edit-toggle-btn { background: white; border: 1px solid #4b2e83; color: #4b2e83; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 600; margin-top: 15px;}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  padding: 10px 20px;
+  border-bottom: 1px solid #efefef;
+  position: static;
+  height: 60px;
+}
+
+/* 1. Keep the logo on the left */
+.logo-container {
+  flex: 0 0 150px; /* Doesn't grow or shrink */
+}
+
+/* 2. The Center Piece */
+.search-container {
+  flex: 1; /* Grows to fill middle space */
+  display: flex;
+  justify-content: center; /* Centers the search bar itself */
+}
+
+.search-bar {
+  width: 100%;
+  max-width: 400px; 
+  padding: 10px 18px;
+  background-color: #f1f1f1;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.search-bar:focus {
+  background-color: #fff;
+  border-color: #4b2e83; 
+  outline: none;
+  box-shadow: 0 0 0 1px #4b2e83;
+}
+
+/* 3. Keep User Info on the right */
+.user-info-container {
+  flex: 0 0 150px; 
+  display: flex;
+  justify-content: flex-end;
+  position: static;
+}
