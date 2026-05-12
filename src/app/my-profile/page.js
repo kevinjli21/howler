@@ -99,12 +99,6 @@ export default function MyProfile() {
               <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
             </div>
             <div className='user-info-container'>
-                <button 
-                  className="create-post-btn"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  Howl
-                </button>
                 <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
                 <UserDropdown username={backendUser.full_name} />
             </div>
@@ -127,16 +121,7 @@ export default function MyProfile() {
 
                 <div className="editable-section">
                     <label>Username</label>
-                    {isEditing ? (
-                        <input 
-                            type="text" 
-                            value={formData.username}
-                            onChange={(e) => setFormData({...formData, username: e.target.value})}
-                            className="edit-input"
-                        />
-                    ) : (
-                        <p className="display-text">@{backendUser?.username}</p>
-                    )}
+                    <p className="display-text">@{backendUser?.username}</p>
 
                     <label>Campus</label>
                     {isEditing ? (

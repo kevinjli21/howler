@@ -13,38 +13,60 @@ export async function GET(request) {
     
     if (!error && data.user) {
       const user = data.user;
+      
+      // 1. Generate Username (kli21@uw.edu -> kli21)
+      const username = user.email ? user.email.split('@')[0] : `user_${user.id.slice(0, 5)}`;
+
+      // 2. Sync Avatar Logic
       const googleUrl = user.user_metadata?.avatar_url;
+      let finalAvatarPath = null;
 
       if (googleUrl) {
         try {
-          // 1. Fetch the image from Google
           const imageRes = await fetch(googleUrl);
           if (imageRes.ok) {
             const arrayBuffer = await imageRes.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
-
-            // 2. Upload to your 'avatar' bucket
-            // Path: public/avatar/user_id.png
             const fileName = `${user.id}.png`;
+
             const { error: storageError } = await supabase.storage
-              .from('avatar')
+              .from('avatars')
               .upload(fileName, buffer, {
                 contentType: 'image/png',
-                upsert: true 
+                upsert: true,
               });
 
             if (!storageError) {
-              await supabase
-                .from('profiles')
-                .update({ avatar_url: fileName })
-                .eq('id', user.id);
+              finalAvatarPath = fileName;
+              console.log("Avatar uploaded successfully.");
             }
           }
         } catch (err) {
           console.error("Avatar sync failed:", err);
         }
       }
-      // --- END AVATAR LOGIC ---
+
+      // 3. Update Profile Table (Username AND Avatar)
+      // We use an update object that conditionally includes the avatar if successful
+      const updateData = { 
+        username: username,
+        full_name: user.user_metadata?.full_name || user.user_metadata?.name 
+      };
+      
+      if (finalAvatarPath) {
+        updateData.avatar_url = finalAvatarPath;
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update(updateData)
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error("Profile update failed:", updateError);
+      } else {
+        console.log("Profile (username and avatar) updated successfully.");
+      }
 
       revalidatePath('/', 'layout');
       return NextResponse.redirect(`${origin}${next}`);

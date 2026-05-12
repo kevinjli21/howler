@@ -78,12 +78,6 @@ export default function SearchPage() {
                 </div>
                 
                 <div className='user-info-container'>
-                    <button 
-                        className="create-post-btn"
-                        onClick={() => setIsModalOpen(true)}
-                    >
-                        Howl
-                    </button>
                     <img 
                         src={getAvatarUrl(backendUser?.avatar_url)} 
                         alt="Profile" 

@@ -60,8 +60,8 @@ const handleSearch = (e) => {
                 >
                   Howl
                 </button>
-                <img src={getAvatarUrl(backendUser.avatar)} alt="Profile" className='profile-pic' />
-                <UserDropdown username={backendUser.name} />
+                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
+                <UserDropdown username={backendUser.full_name} />
             </div>
           </nav>
           <div className='post-section'>
