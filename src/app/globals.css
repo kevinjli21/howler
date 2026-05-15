@@ -62,11 +62,14 @@ body {
   font-size: 4rem;
   letter-spacing: -0.5px;
   color: #b7a57a;
-  padding-left: 2rem;
+  padding-left: 20px;
   margin-top: 0;
   padding-top: 28px;
 }
 
+.logo-link-wrapper {
+  text-decoration: none;
+}
 .user-info {
   display: flex;
   position: fixed;
@@ -620,18 +623,31 @@ body {
 /* 1. Keep the logo on the left */
 .logo-container {
   flex: 1; /* Doesn't grow or shrink */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  margin-top: 0px;
+  margin-bottom: 16px;
 }
 
 /* 2. The Center Piece */
 .search-container {
-  flex: 2; /* Grows to fill middle space */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 600px; /* Moves the constraint to the container */
   display: flex;
-  justify-content: center; /* Centers the search bar itself */
+  justify-content: center;
 }
 
 .search-bar {
-  width: 100%;
-  max-width: 400px; 
+  width: 100%; /* Now safely fills the centered container */
   padding: 10px 18px;
   background-color: #f1f1f1;
   border: 1px solid transparent;
@@ -798,4 +814,101 @@ body {
   margin-top: 8px;
   color: #666;
   font-size: 0.8rem;
+}
+
+/* Modal Overlay - To center the report form over the feed */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Modal Content Box - Matching post-form width logic */
+.modal-content {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.25rem;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.modal-content p {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-bottom: 1.25rem;
+}
+
+/* Form Layout - Inheriting your flex column logic */
+.report-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Dropdown styling - Matching post-textarea border and radius */
+.report-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+  appearance: none; /* Removes default browser styling */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
+.report-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* Actions - Matching your form-actions exactly */
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Reusing your button classes directly in the component is best, 
+   but here they are as local report styles just in case */
+.btn-report-submit {
+  padding: 0.5rem 1rem;
+  background-color: #dc2626; /* Red for "Warning/Report" action */
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.btn-report-submit:hover {
+  background-color: #b91c1c;
+}
+
+.btn-report-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

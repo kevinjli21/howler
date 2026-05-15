@@ -18,7 +18,8 @@ export async function GET(request) {
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
-    
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id || null;
     const page = parseInt(searchParams.get('page') || '1');
     const categoryId = searchParams.get('categoryId'); 
     const limit = 10;
@@ -32,8 +33,12 @@ export async function GET(request) {
         profiles (full_name, avatar_url, username),
         categories (category_name, color),
         comments(count),
-        likes(count)
+        likes:likes(count), 
+        user_has_liked:likes(user_id)
       `)
+      // CRITICAL: This filter ensures the 'user_has_liked' array ONLY 
+      // contains the current user's ID if they liked it.
+      .eq('user_has_liked.user_id', userId) 
       .order('posted_at', { ascending: false })
       .range(from, to);
 

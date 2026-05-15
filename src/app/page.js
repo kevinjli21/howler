@@ -45,11 +45,12 @@ const handleSearch = (e) => {
       {backendUser?.authenticated ? (
         <div className='signed-in'>
           <nav className='navbar'>
-            <div className='logo-container'>
-              <h1 className='signed-in-title'><Link className='site-title-link' href="/">
-                Howler
-              </Link></h1>
-            </div>
+            <Link href="/" className='logo-link-wrapper'>
+              <div className='logo-container'>
+                <img className='logo' src="/icon.png" alt="Howler Logo" />
+                <h1 className='signed-in-title'>Howler</h1>
+              </div>
+            </Link>
             <div className='search-container'>
               <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
             </div>

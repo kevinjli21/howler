@@ -61,11 +61,12 @@ export default function SearchPage() {
         <div>
             {/* Navbar Section */}
             <nav className='navbar'>
-                <div className='logo-container'>
-                    <h1 className='signed-in-title'>
-                        <Link className='site-title-link' href="/">Howler</Link>
-                    </h1>
-                </div>
+                <Link href="/" className='logo-link-wrapper'>
+                    <div className='logo-container'>
+                        <img className='logo' src="/icon.png" alt="Howler Logo" />
+                        <h1 className='signed-in-title'>Howler</h1>
+                    </div>
+                </Link>
 
                 <div className='search-container'>
                     <input 
