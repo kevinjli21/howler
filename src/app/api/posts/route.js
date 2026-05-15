@@ -1,99 +1,125 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import { AllProfanity } from 'allprofanity';
+import config from '@/utils/allprofanity/allprofanity.config.json';
+import { ImageAnnotatorClient } from '@google-cloud/vision';
 
-// GET handler for fetching posts with pagination and optional category filtering
+// 1. Initialize Vision Client once outside the handlers
+const visionClient = new ImageAnnotatorClient({
+  credentials: {
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+  },
+  projectId: process.env.GOOGLE_PROJECT_ID,
+});
+
+// --- GET HANDLER ---
 export async function GET(request) {
-  const supabase = await createClient();
-  const { searchParams } = new URL(request.url);
-  
-  const page = parseInt(searchParams.get('page') || '1');
-  const categoryId = searchParams.get('categoryId'); 
-  const limit = 10;
-  const from = (page - 1) * limit;
-  const to = from + limit - 1;
+  try {
+    const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    
+    const page = parseInt(searchParams.get('page') || '1');
+    const categoryId = searchParams.get('categoryId'); 
+    const limit = 10;
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
 
-  let query = supabase
-    .from('posts')
-    .select(`
-      *, 
-      profiles (full_name, avatar_url, username),
-      categories (category_name, color),
-      comments(count),
-      likes(count)
-    `)
-    .order('posted_at', { ascending: false })
-    .range(from, to);
+    let query = supabase
+      .from('posts')
+      .select(`
+        *, 
+        profiles (full_name, avatar_url, username),
+        categories (category_name, color),
+        comments(count),
+        likes(count)
+      `)
+      .order('posted_at', { ascending: false })
+      .range(from, to);
 
-  if (categoryId) {
-    query = query.eq('category_id', categoryId);
+    if (categoryId) {
+      query = query.eq('category_id', categoryId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  const { data, error } = await query;
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json(data);
 }
 
-
-// POST handler for creating a new post with optional image upload
+// --- POST HANDLER ---
 export async function POST(req) {
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
+    const filter = AllProfanity.fromConfig(config);
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
-  const formData = await req.formData();
-  const content = formData.get('content');
-  const categoryId = formData.get('category_id');
-  const file = formData.get('image');
-
-  let imageUrl = null;
-
-  if (file && file.size > 0) {
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; 
-    if (file.size > MAX_FILE_SIZE) {
-      return NextResponse.json({ error: 'File size exceeds 5MB limit' }, { status: 413 });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type.' }, { status: 400 });
+    const formData = await req.formData();
+    const content = formData.get('content');
+    const categoryId = formData.get('category_id');
+    const file = formData.get('image');
+
+    // Text Validation
+    if (filter.check(content)) {
+      return NextResponse.json({ error: 'Inappropriate content detected.' }, { status: 400 });
     }
 
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    let imageUrl = null;
 
-    const { error: uploadError } = await supabase.storage
-      .from('posts')
-      .upload(fileName, file);
+    // Image Validation & Upload
+    if (file && file.size > 0) {
+      const buffer = Buffer.from(await file.arrayBuffer());
 
-    if (uploadError) {
-        console.log('Upload error:', uploadError);
-        return NextResponse.json({ error: uploadError.message }, { status: 500 });        
-    }
+      // SafeSearch Scan
+      const [result] = await visionClient.safeSearchDetection(buffer);
+      const detections = result.safeSearchAnnotation;
+      console.log(`Adult: ${detections.adult}`);
+      console.log(`Spoof: ${detections.spoof}`);
+      console.log(`Medical: ${detections.medical}`);
+      console.log(`Violence: ${detections.violence}`);
+      const isUnsafe = 
+        detections.adult === 'LIKELY' || detections.adult === 'VERY_LIKELY' ||
+        detections.violence === 'LIKELY' || detections.violence === 'VERY_LIKELY' || detections.adult === 'POSSIBLE';
 
-    const { data: publicUrlData } = supabase.storage.from('posts').getPublicUrl(fileName);
-    imageUrl = publicUrlData.publicUrl;
-  }
-
-  const { data, error: dbError } = await supabase
-    .from('posts')
-    .insert([
-      { 
-        content, 
-        category_id: categoryId,
-        image_url: imageUrl, 
-        user_id: user.id,
-        posted_at: new Date().toISOString() 
+      if (isUnsafe) {
+        return NextResponse.json({ error: 'Image violates safety guidelines.' }, { status: 400 });
       }
-    ]);
 
-  if (dbError) {
-    console.log('Database error:', dbError);
-    return NextResponse.json({ error: dbError.message }, { status: 500 });
+      // Storage Upload
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      const { error: uploadError } = await supabase.storage
+        .from('posts')
+        .upload(fileName, buffer, { contentType: file.type });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage.from('posts').getPublicUrl(fileName);
+      imageUrl = urlData.publicUrl;
+    }
+
+    // Database Insert
+    const { data, error: dbError } = await supabase
+      .from('posts')
+      .insert([{ 
+        content, 
+        category_id: categoryId, 
+        image_url: imageUrl, 
+        user_id: user.id 
+      }]);
+
+    if (dbError) throw dbError;
+
+    return NextResponse.json({ success: true, data });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
-
-  return NextResponse.json({ success: true, data });
 }

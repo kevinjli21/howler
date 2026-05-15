@@ -14,7 +14,7 @@ export async function GET(request) {
     if (!error && data.user) {
       const user = data.user;
       
-      // 1. Generate Username (kli21@uw.edu -> kli21)
+      // 1. Generate Username 
       const username = user.email ? user.email.split('@')[0] : `user_${user.id.slice(0, 5)}`;
 
       // 2. Sync Avatar Logic

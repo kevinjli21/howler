@@ -432,8 +432,8 @@ body {
 }
 
 .post-image {
-  max-height: 50%;
-  max-width: 50%;
+  max-height: 30%;
+  max-width: 30%;
   border-radius: 16px; 
   margin-top: 0.5rem;
   border: 1px solid #efefef;
@@ -695,6 +695,7 @@ body {
   border-radius: 12px;
   background: #fff;
   transition: box-shadow 0.2s ease;
+  margin-bottom: 8px;
 }
 
 .search-user-card:hover {
