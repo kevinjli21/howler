@@ -355,6 +355,21 @@ body {
   margin-top: 0.5rem;
 }
 
+.category-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+  appearance: none; /* Removes default browser styling */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+}
+
 .error-message {
   color: #dc2626; /* Red color */
   font-size: 0.875rem;
@@ -531,15 +546,32 @@ body {
   border-top: 1px solid #f0f0f0;
 }
 
+/* 2. Individual interaction item styles (likes, comments, etc.) */
 .interaction-item {
   display: flex;
   align-items: center;
-  gap: 5px;
-  color: #536471;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.2s;
+  gap: 0.35rem; /* Space between the emoji and the count text */
+  font-size: 0.95rem;
+  color: #4b5563; /* Subtle gray for text */
+}
+
+/* 3. The Magic Trick: Pushes the report or delete button to the far right */
+.action-right {
+  margin-left: auto;
+}
+
+/* Optional: Slight hover effects to make the interaction snappy */
+.interaction-item span {
+  user-select: none; /* Prevents highlighting the emoji text on double taps */
+  transition: transform 0.1s ease;
+}
+
+.interaction-item:hover span {
+  transform: scale(1.15); /* Gives a nice little pop when hovered */
+}
+
+.delete-trigger:hover {
+  color: #dc2626; /* Darker red on hover */
 }
 
 .interaction-item:hover {
