@@ -13,6 +13,9 @@ const visionClient = new ImageAnnotatorClient({
   projectId: process.env.GOOGLE_PROJECT_ID,
 });
 
+// Define a global character limit constant
+const MAX_CHAR_LIMIT = 500; 
+
 // --- GET HANDLER ---
 export async function GET(request) {
   try {
@@ -36,8 +39,6 @@ export async function GET(request) {
         likes:likes(count), 
         user_has_liked:likes(user_id)
       `)
-      // CRITICAL: This filter ensures the 'user_has_liked' array ONLY 
-      // contains the current user's ID if they liked it.
       .eq('user_has_liked.user_id', userId) 
       .order('posted_at', { ascending: false })
       .range(from, to);
@@ -67,37 +68,68 @@ export async function POST(req) {
     }
 
     const formData = await req.formData();
-    const content = formData.get('content');
+    const content = formData.get('content') || ''; // Fallback to string if empty
     const categoryId = formData.get('category_id');
     const file = formData.get('image');
 
-    // Text Validation
+    // --- CHARACTER LIMIT VALIDATION ---
+    if (!content.trim()) {
+      return NextResponse.json({ error: 'Post content cannot be empty.' }, { status: 400 });
+    }
+
+    if (content.length > MAX_CHAR_LIMIT) {
+      return NextResponse.json({ 
+        error: `Post is too long! Please keep it under ${MAX_CHAR_LIMIT} characters (Current: ${content.length}).` 
+      }, { status: 400 });
+    }
+
+    // Text Profanity Validation
     if (filter.check(content)) {
       return NextResponse.json({ error: 'Inappropriate content detected.' }, { status: 400 });
     }
 
     let imageUrl = null;
 
-    // Image Validation & Upload
+    // Image Validation, Rate Limiting & Upload
     if (file && file.size > 0) {
+      const THREE_MINUTES_AGO = new Date(Date.now() - 3 * 60 * 1000).toISOString();
+
+      const { count, error: countError } = await supabase
+        .from('image_upload_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .gte('created_at', THREE_MINUTES_AGO);
+
+      if (countError) throw countError;
+
+      if (count && count >= 3) {
+        return NextResponse.json({ 
+          error: 'Slow down! You have attempted too many image uploads. Please wait a few minutes.' 
+        }, { status: 429 });
+      }
+
+      const { error: logError } = await supabase
+        .from('image_upload_logs')
+        .insert([{ user_id: user.id }]);
+        
+      if (logError) throw logError;
+
       const buffer = Buffer.from(await file.arrayBuffer());
 
-      // SafeSearch Scan
       const [result] = await visionClient.safeSearchDetection(buffer);
       const detections = result.safeSearchAnnotation;
-      console.log(`Adult: ${detections.adult}`);
-      console.log(`Spoof: ${detections.spoof}`);
-      console.log(`Medical: ${detections.medical}`);
-      console.log(`Violence: ${detections.violence}`);
+      
+      console.log(`[Google Vision Executed] Checking image for user ${user.id}`);
+      
       const isUnsafe = 
         detections.adult === 'LIKELY' || detections.adult === 'VERY_LIKELY' ||
-        detections.violence === 'LIKELY' || detections.violence === 'VERY_LIKELY' || detections.adult === 'POSSIBLE';
+        detections.violence === 'LIKELY' || detections.violence === 'VERY_LIKELY' || 
+        detections.adult === 'POSSIBLE';
 
       if (isUnsafe) {
         return NextResponse.json({ error: 'Image violates safety guidelines.' }, { status: 400 });
       }
 
-      // Storage Upload
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       const { error: uploadError } = await supabase.storage
@@ -110,7 +142,7 @@ export async function POST(req) {
       imageUrl = urlData.publicUrl;
     }
 
-    // Database Insert
+    // Database Insert for the actual post
     const { data, error: dbError } = await supabase
       .from('posts')
       .insert([{ 

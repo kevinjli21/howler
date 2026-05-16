@@ -89,7 +89,7 @@ export default function PostFeed() {
     ));
 
     try {
-      const res = await fetch('/api/posts/like', {
+      const res = await fetch('/api/likes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ post_id: post.id })

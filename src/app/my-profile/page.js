@@ -9,13 +9,12 @@ export default function MyProfile() {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [campuses, setCampuses] = useState([]); // State to store all campus options
-
+    const [error, setError] = useState(''); // State to store error messages
     const [formData, setFormData] = useState({
         username: '',
         bio: '',
         campus_id: ''
     });
-
 
     useEffect(() => {
         async function fetchProfileAndCampuses() {
@@ -48,9 +47,9 @@ export default function MyProfile() {
         fetchProfileAndCampuses();
     }, []);
     
-
     const handleSave = async () => {
         setLoading(true);
+        setError(''); // Clear any previous error before trying to save again
         try {
             const res = await fetch('/api/myprofile', {
                 method: 'PATCH', 
@@ -58,13 +57,17 @@ export default function MyProfile() {
                 body: JSON.stringify(formData),
             });
 
+            const data = await res.json();
+
             if (res.ok) {
-                const updatedUser = await res.json();
-                setBackendUser(updatedUser);
+                setBackendUser(data);
                 setIsEditing(false);
+            } else {
+                // If the backend returns a failing status code (e.g., 400 or 500)
+                throw new Error(data.error || 'Failed to update profile changes.');
             }
         } catch (err) {
-            console.error("Update failed", err);
+            setError(err.message); // Save the explicit error message to show in the UI
         } finally {
             setLoading(false);
         }
@@ -77,8 +80,22 @@ export default function MyProfile() {
         }
     };
 
+    // Helper to exit edit mode and clean up errors
+    const handleCancel = () => {
+        setIsEditing(false);
+        setError('');
+        // Revert form state back to the original values
+        if (backendUser) {
+            setFormData({
+                username: backendUser.username || '',
+                bio: backendUser.bio || '',
+                campus_id: backendUser.campus_id || ''
+            });
+        }
+    };
+
     if (!backendUser) return <div className="search-page-layout">Verifying session...</div>;
-    if (loading) {
+    if (loading && !backendUser) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
                 <p>Loading your UW Howler profile...</p>
@@ -86,24 +103,24 @@ export default function MyProfile() {
         );
     }
 
-
     return (
         <div>
             <nav className='navbar'>
-            <Link href="/" className='logo-link-wrapper'>
-              <div className='logo-container'>
-                <img className='logo' src="/icon.png" alt="Howler Logo" />
-                <h1 className='signed-in-title'>Howler</h1>
-              </div>
-            </Link>
-            <div className='search-container'>
-              <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
-            </div>
-            <div className='user-info-container'>
-                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
-                <UserDropdown username={backendUser.full_name} />
-            </div>
-          </nav>
+                <Link href="/" className='logo-link-wrapper'>
+                    <div className='logo-container'>
+                        <img className='logo' src="/icon.png" alt="Howler Logo" />
+                        <h1 className='signed-in-title'>Howler</h1>
+                    </div>
+                </Link>
+                <div className='search-container'>
+                    <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
+                </div>
+                <div className='user-info-container'>
+                    <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
+                    <UserDropdown username={backendUser.full_name} />
+                </div>
+            </nav>
+
             <div className="my-profile-container">
                 <div className="profile-header">
                     {backendUser?.avatar_url && (
@@ -111,7 +128,6 @@ export default function MyProfile() {
                     )}
                     <div className="profile-meta">
                         <h1>{backendUser?.full_name}</h1>
-                        {/* Display current campus name from the join */}
                         <p className="campus-label">
                             📍 {backendUser?.campus?.name || "No campus selected"}
                         </p>
@@ -119,6 +135,13 @@ export default function MyProfile() {
                 </div>
 
                 <hr />
+
+                {/* ERROR RENDERING: Reusing your .error-message styling context */}
+                {error && (
+                    <div className="error-message" style={{ marginBottom: '1.5rem' }}>
+                        {error}
+                    </div>
+                )}
 
                 <div className="editable-section">
                     <label>Username</label>
@@ -130,6 +153,7 @@ export default function MyProfile() {
                             value={formData.campus_id}
                             onChange={(e) => setFormData({...formData, campus_id: e.target.value})}
                             className="edit-input"
+                            disabled={loading}
                         >
                             <option value="">Select your campus</option>
                             {campuses.map((c) => (
@@ -148,6 +172,8 @@ export default function MyProfile() {
                             value={formData.bio}
                             onChange={(e) => setFormData({...formData, bio: e.target.value})}
                             className="edit-textarea"
+                            maxlength={160}
+                            disabled={loading}
                         />
                     ) : (
                         <p className="display-text">{backendUser?.bio || "No bio yet..."}</p>
@@ -160,7 +186,9 @@ export default function MyProfile() {
                             <button onClick={handleSave} className="save-btn" disabled={loading}>
                                 {loading ? 'Saving...' : 'Save Changes'}
                             </button>
-                            <button onClick={() => setIsEditing(false)} className="cancel-btn">Cancel</button>
+                            <button onClick={handleCancel} className="cancel-btn" disabled={loading}>
+                                Cancel
+                            </button>
                         </>
                     ) : (
                         <button onClick={() => setIsEditing(true)} className="edit-toggle-btn">Edit Profile</button>
