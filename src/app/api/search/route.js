@@ -10,26 +10,29 @@ export async function GET(request) {
   const supabase = await createClient();
   const searchKeyword = `%${query}%`;
 
-    const [profilesRes, postsRes] = await Promise.all([
+  const [profilesRes, postsRes] = await Promise.all([
+    // 1. Search User Profiles
     supabase
-        .from('profiles')
-        .select('id, username, full_name, avatar_url')
-        .or(`username.ilike.${searchKeyword},full_name.ilike.${searchKeyword}`)
-        .limit(5),
+      .from('profiles')
+      .select('id, username, full_name, avatar_url')
+      .or(`username.ilike.${searchKeyword},full_name.ilike.${searchKeyword}`)
+      .limit(5),
 
+    // 2. Search Posts (Now returning categories for the UI badges)
     supabase
-        .from('posts')
-        .select(`
+      .from('posts')
+      .select(`
         id, 
         content, 
         image_url, 
         posted_at, 
-        profiles(full_name, username, avatar_url)
-        `) // Added image_url here
-        .ilike('content', searchKeyword)
-        .order('posted_at', { ascending: false })
-        .limit(10)
-    ]);
+        profiles(full_name, username, avatar_url),
+        categories(category_name, color)
+      `)
+      .ilike('content', searchKeyword)
+      .order('posted_at', { ascending: false })
+      .limit(10)
+  ]);
 
   return NextResponse.json({
     profiles: profilesRes.data || [],

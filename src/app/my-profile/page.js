@@ -172,7 +172,7 @@ export default function MyProfile() {
                             value={formData.bio}
                             onChange={(e) => setFormData({...formData, bio: e.target.value})}
                             className="edit-textarea"
-                            maxlength={160}
+                            maxLength={160}
                             disabled={loading}
                         />
                     ) : (

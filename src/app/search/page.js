@@ -11,9 +11,8 @@ export default function SearchPage() {
     const query = searchParams.get('q');
     const [results, setResults] = useState({ profiles: [], posts: [] });
     const [loading, setLoading] = useState(true);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // 1. Fetch Search Results (including image_url)
+    // 1. Fetch Search Results (including image_url and nested relations)
     useEffect(() => {
         if (query) {
             setLoading(true);
@@ -125,6 +124,19 @@ export default function SearchPage() {
                                 <>
                                     {results.posts.map(post => (
                                         <article key={post.id} className="post-card">
+                                            {/* CATEGORY BADGE ADDED HERE */}
+                                            {post.categories?.category_name && (
+                                                <span 
+                                                    className="category-badge"
+                                                    style={{ 
+                                                        backgroundColor: post.categories.color || '#4b5563',
+                                                        color: '#ffffff',
+                                                    }}
+                                                >
+                                                    {post.categories.category_name}
+                                                </span>
+                                            )}
+
                                             <div className="post-header">
                                                 <img 
                                                     src={getAvatarUrl(post.profiles?.avatar_url)} 
@@ -142,8 +154,9 @@ export default function SearchPage() {
                                             {/* Display Post Image if it exists */}
                                             {post.image_url && (
                                                 <div className="post-image-container">
+                                                    {/* Changed from getAvatarUrl to direct source, matching PostFeed image rendering */}
                                                     <img 
-                                                        src={getAvatarUrl(post.image_url)} 
+                                                        src={post.image_url} 
                                                         alt="Post content" 
                                                         className="post-image-main"
                                                     />
@@ -152,8 +165,8 @@ export default function SearchPage() {
 
                                             <small className="post-date-stamp">
                                                 {new Date(post.posted_at).toLocaleString([], { 
-                                                dateStyle: 'short', 
-                                                timeStyle: 'short' 
+                                                    dateStyle: 'short', 
+                                                    timeStyle: 'short' 
                                                 })}
                                             </small>
                                         </article>
