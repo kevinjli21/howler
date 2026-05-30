@@ -1,8 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link'; // Imported for path routing
 import CategoryFilter from './CategoryFilter';
 import { getAvatarUrl } from '@/utils/helpers';
 import ReportModal from './ReportModal';
+import CommentsModal from './CommentsModal';
 
 const LIMIT = 10;
 
@@ -13,21 +15,18 @@ export default function PostFeed() {
   const [loading, setLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [hasMore, setHasMore] = useState(true);
-  
-  // 1. Add state to hold the actual authenticated User UUID
+  const [activeCommentPost, setActiveCommentPost] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
 
-  // 2. Fetch the authenticated user's UUID on mount
   useEffect(() => {
     const fetchUserUuid = async () => {
       try {
-        // Dynamically import the browser client utility to get the active session
         const { createClient } = await import('@/utils/supabase/client');
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          setCurrentUserId(user.id); // This will be the pure UUID string
+          setCurrentUserId(user.id);
         }
       } catch (err) {
         console.error("Failed to fetch user UUID on client side:", err);
@@ -136,9 +135,12 @@ export default function PostFeed() {
         ) : (
           posts.map((post) => {
             const hasLiked = Array.isArray(post.user_has_liked) && post.user_has_liked.length > 0;
-            
-            // 3. Match UUID to UUID (e.g. 'user_id' matching 'currentUserId')
             const isMyPost = post.user_id === currentUserId;
+
+            // Determine route based on if the post matches logged in context
+            const profileLink = isMyPost 
+              ? '/my-profile' 
+              : `/profile/${post.profiles?.username}`;
 
             return (
               <article key={post.id} className="post-card">
@@ -156,16 +158,23 @@ export default function PostFeed() {
                 
                 <div className="post-header">
                   {post.profiles?.avatar_url && (
-                    <img 
-                      src={getAvatarUrl(post.profiles.avatar_url)} 
-                      alt={post.profiles.full_name || 'User avatar'} 
-                      className="avatar-img"
-                    />
+                    <Link href={profileLink}>
+                      <img 
+                        src={getAvatarUrl(post.profiles.avatar_url)} 
+                        alt={post.profiles.full_name || 'User avatar'} 
+                        className="avatar-img"
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </Link>
                   )}
                   <h3 className="post-author">
-                    {post.profiles?.full_name || 'Anonymous'}
+                    <Link href={profileLink} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <span style={{ fontWeight: 'bold' }}>{post.profiles?.full_name || 'Anonymous'}</span>
+                    </Link>
                     {post.profiles?.username && (
-                      <span className="post-username"> @{post.profiles.username}</span>
+                      <Link href={profileLink} style={{ textDecoration: 'none' }}>
+                        <span className="post-username"> @{post.profiles.username}</span>
+                      </Link>
                     )}
                   </h3>
                 </div>
@@ -206,7 +215,7 @@ export default function PostFeed() {
                     </span>
                   </div>
                   
-                  <div className="interaction-item">
+                  <div className="interaction-item" onClick={() => setActiveCommentPost(post)} style={{ cursor: 'pointer' }}>
                     <span>💬</span> {post.comments?.[0]?.count || 0}
                   </div>
                   
@@ -233,6 +242,16 @@ export default function PostFeed() {
               </article>
             );
           })
+        )}
+
+        {activeCommentPost && (
+          <CommentsModal 
+            post={posts.find(p => p.id === activeCommentPost.id) || activeCommentPost}
+            currentUserId={currentUserId}
+            onClose={() => setActiveCommentPost(null)}
+            onLike={handleLike}
+            onDeletePost={handleDelete}
+          />
         )}
 
         {reportingPost && (
