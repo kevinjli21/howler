@@ -10,27 +10,27 @@ const ratelimit = new Ratelimit({
 });
 
 export async function proxy(request) {
-  const currentPath = request.nextUrl.pathname;
+  // const currentPath = request.nextUrl.pathname;
 
 
-  if (currentPath.startsWith('/api/')) {
-    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
-    const { success, limit, reset, remaining } = await ratelimit.limit(ip);
+  // if (currentPath.startsWith('/api/')) {
+  //   const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+  //   const { success, limit, reset, remaining } = await ratelimit.limit(ip);
 
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Too many requests howling in at once! Please slow down.' },
-        { 
-          status: 429, 
-          headers: {
-            'X-RateLimit-Limit': limit.toString(),
-            'X-RateLimit-Remaining': remaining.toString(),
-            'X-RateLimit-Reset': reset.toString(),
-          }
-        }
-      );
-    }
-  }
+  //   if (!success) {
+  //     return NextResponse.json(
+  //       { error: 'Too many requests howling in at once! Please slow down.' },
+  //       { 
+  //         status: 429, 
+  //         headers: {
+  //           'X-RateLimit-Limit': limit.toString(),
+  //           'X-RateLimit-Remaining': remaining.toString(),
+  //           'X-RateLimit-Reset': reset.toString(),
+  //         }
+  //       }
+  //     );
+  //   }
+  // }
 
   let response = NextResponse.next({
     request: {
