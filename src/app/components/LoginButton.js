@@ -10,10 +10,10 @@ export default function LoginButton() {
       options: {
         // 1. Keeps your original, automatic domain utility with the critical ?next=/ parameter
         redirectTo: `${window.location.origin}/auth/callback?next=/`,
-        queryParams: {
-          // 2. Restricts the OAuth portal strictly to UW student/faculty email domains
-          hd: 'uw.edu'
-        }
+        // queryParams: {
+        //   // 2. Restricts the OAuth portal strictly to UW student/faculty email domains
+        //   hd: 'uw.edu'
+        // }
       },
     });
   };
