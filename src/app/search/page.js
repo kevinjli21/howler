@@ -1,22 +1,20 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react'; // 1. Added Suspense import
 import Link from 'next/link';
 import UserDropdown from '../components/UserDropdown';
 import CommentsModal from '../components/CommentsModal'; 
 import { getAvatarUrl } from '@/utils/helpers';
 
-export default function SearchPage() {
+// 2. RENAME YOUR MAIN BODY COMPONENT TO "SearchContent"
+function SearchContent() {
     const searchParams = useSearchParams();
     const [backendUser, setBackendUser] = useState(null);
     const query = searchParams.get('q');
     const [results, setResults] = useState({ profiles: [], posts: [] });
     const [loading, setLoading] = useState(true);
-    
-    // Track modal and like interaction context states
     const [activeCommentPost, setActiveCommentPost] = useState(null);
 
-    // 1. Fetch Search Results (including image_url and nested relations)
     useEffect(() => {
         if (query) {
             setLoading(true);
@@ -33,7 +31,6 @@ export default function SearchPage() {
         }
     }, [query]);
 
-    // 2. Fetch Current User Auth
     useEffect(() => {
         async function fetchMyAuth() {
             try {
@@ -49,36 +46,26 @@ export default function SearchPage() {
         fetchMyAuth();
     }, []);
 
-    // Interactive internal search timeline like framework handler
     const handleSearchPostLike = async (post) => {
         if (!backendUser) return;
-        
         const isCurrentlyLiked = Array.isArray(post.user_has_liked) && post.user_has_liked.length > 0;
-        const newCount = isCurrentlyLiked 
-            ? Math.max(0, (post.likes?.[0]?.count || 0) - 1) 
-            : (post.likes?.[0]?.count || 0) + 1;
+        const newCount = isCurrentlyLiked ? Math.max(0, (post.likes?.[0]?.count || 0) - 1) : (post.likes?.[0]?.count || 0) + 1;
 
-        // Optimistic State Mutation
         setResults(prev => ({
             ...prev,
             posts: prev.posts.map(p => 
                 p.id === post.id 
-                    ? { 
-                        ...p, 
-                        likes: [{ count: newCount }], 
-                        user_has_liked: isCurrentlyLiked ? [] : [{ user_id: backendUser.id }] 
-                      } 
+                    ? { ...p, likes: [{ count: newCount }], user_has_liked: isCurrentlyLiked ? [] : [{ user_id: backendUser.id }] } 
                     : p
             )
         }));
 
         try {
-            const res = await fetch('/api/likes', {
+            await fetch('/api/likes', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ post_id: post.id })
             });
-            if (!res.ok) throw new Error('Failed to synchronize like status.');
         } catch (error) {
             console.error(error);
         }
@@ -105,23 +92,11 @@ export default function SearchPage() {
                         <h1 className='signed-in-title'>Howler</h1>
                     </div>
                 </Link>
-
                 <div className='search-container'>
-                    <input 
-                        type="text" 
-                        placeholder="Search for posts or users..." 
-                        className='search-bar' 
-                        onKeyDown={handleSearch}
-                        defaultValue={query || ''}
-                    />
+                    <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch} defaultValue={query || ''} />
                 </div>
-                
                 <div className='user-info-container'>
-                    <img 
-                        src={getAvatarUrl(backendUser?.avatar_url)} 
-                        alt="Profile" 
-                        className='profile-pic' 
-                    />
+                    <img src={getAvatarUrl(backendUser?.avatar_url)} alt="Profile" className='profile-pic' />
                     <UserDropdown username={backendUser?.full_name || 'User'} />
                 </div>
             </nav>
@@ -136,17 +111,10 @@ export default function SearchPage() {
                     <div className="search-user-list">
                         {results.profiles.length > 0 ? (
                             results.profiles.map(user => {
-                                const targetUserPath = backendUser && user.id === backendUser.id 
-                                    ? '/myprofile' 
-                                    : `/profile/${user.username}`;
-
+                                const targetUserPath = backendUser && user.id === backendUser.id ? '/myprofile' : `/profile/${user.username}`;
                                 return (
                                     <Link href={targetUserPath} key={user.id} className="search-user-card" style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}>
-                                        <img 
-                                            src={getAvatarUrl(user.avatar_url)} 
-                                            alt={user.username} 
-                                            className="profile-avatar-large" 
-                                        />
+                                        <img src={getAvatarUrl(user.avatar_url)} alt={user.username} className="profile-avatar-large" />
                                         <div>
                                             <p className="full-name" style={{ fontWeight: 'bold', margin: 0 }}>{user.full_name}</p>
                                             <p className="username" style={{ color: '#64748b', margin: 0 }}>@{user.username}</p>
@@ -169,45 +137,19 @@ export default function SearchPage() {
                                 <>
                                     {results.posts.map(post => {
                                         const hasLiked = Array.isArray(post.user_has_liked) && post.user_has_liked.length > 0;
-                                        
-                                        // Bulletproof fallback verification check
-                                        const isMyPost = !!backendUser?.id && !!post.user_id && post.user_id === backendUser.id;
-
-                                        // 2. DEBUGGER LOG: Open your browser console (F12) to see exactly what IDs are fighting
-                                        console.log("--- Debugging Post Ownership ---", {
-                                            postContent: post.content?.substring(0, 15),
-                                            postOwnerId: post.user_id,
-                                            myCurrentId: backendUser?.id,
-                                            doTheyMatch: isMyPost
-                                        });
-                                        
-                                        const postAuthorPath = isMyPost 
-                                            ? '/myprofile' 
-                                            : `/profile/${post.profiles?.username}`;
+                                        const isMyPost = backendUser && post.user_id === backendUser.id;
+                                        const postAuthorPath = isMyPost ? '/myprofile' : `/profile/${post.profiles?.username}`;
 
                                         return (
                                             <article key={post.id} className="post-card">
                                                 {post.categories?.category_name && (
-                                                    <span 
-                                                        className="category-badge"
-                                                        style={{ 
-                                                            backgroundColor: post.categories.color || '#4b5563',
-                                                            color: '#ffffff',
-                                                        }}
-                                                    >
+                                                    <span className="category-badge" style={{ backgroundColor: post.categories.color || '#4b5563', color: '#ffffff' }}>
                                                         {post.categories.category_name}
                                                     </span>
                                                 )}
-
-                                                {/* FIXED: Closed the header container strictly right after the meta information ends */}
                                                 <div className="post-header">
                                                     <Link href={postAuthorPath}>
-                                                        <img 
-                                                            src={getAvatarUrl(post.profiles?.avatar_url)} 
-                                                            alt={post.profiles?.full_name || 'User avatar'} 
-                                                            className="avatar-img"
-                                                            style={{ cursor: 'pointer' }}
-                                                        />
+                                                        <img src={getAvatarUrl(post.profiles?.avatar_url)} alt={post.profiles?.full_name || 'User avatar'} className="avatar-img" style={{ cursor: 'pointer' }} />
                                                     </Link>
                                                     <h3 className="post-author">
                                                         <Link href={postAuthorPath} style={{ textDecoration: 'none', color: 'inherit' }}>
@@ -220,84 +162,34 @@ export default function SearchPage() {
                                                         )}
                                                     </h3>
                                                 </div>
-
-                                                {/* FIXED: Placed content elements out here, perfectly mimicking PostFeed */}
                                                 <p>{post.content}</p>
-
-                                                {post.image_url && (
-                                                    <img 
-                                                        src={post.image_url} 
-                                                        alt="Post attachment" 
-                                                        className="post-image"
-                                                    />
-                                                )}
-
-                                                <small>
-                                                    {new Date(post.posted_at).toLocaleString([], { 
-                                                        dateStyle: 'short', 
-                                                        timeStyle: 'short' 
-                                                    })}
-                                                </small>
-
-                                                {/* Post Action Toolbar */}
+                                                {post.image_url && <img src={post.image_url} alt="Post attachment" className="post-image" />}
+                                                <small>{new Date(post.posted_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</small>
+                                                
                                                 <div className="post-interactions" style={{ marginTop: '0.75rem' }}>
-                                                    <div 
-                                                        className="interaction-item" 
-                                                        onClick={() => handleSearchPostLike(post)}
-                                                        style={{ cursor: 'pointer' }}
-                                                    >
-                                                        <span style={{ color: hasLiked ? '#ff4b4b' : 'inherit', transition: 'color 0.2s' }}>
-                                                            {hasLiked ? '❤️' : '🤍'}
-                                                        </span> 
-                                                        <span className="like-count">
-                                                            {post.likes?.[0]?.count || 0}
-                                                        </span>
+                                                    <div className="interaction-item" onClick={() => handleSearchPostLike(post)} style={{ cursor: 'pointer' }}>
+                                                        <span style={{ color: hasLiked ? '#ff4b4b' : 'inherit', transition: 'color 0.2s' }}>{hasLiked ? '❤️' : '🤍'}</span> 
+                                                        <span className="like-count">{post.likes?.[0]?.count || 0}</span>
                                                     </div>
-                                                    
-                                                    <div 
-                                                        className="interaction-item" 
-                                                        onClick={() => setActiveCommentPost(post)} 
-                                                        style={{ cursor: 'pointer' }}
-                                                    >
+                                                    <div className="interaction-item" onClick={() => setActiveCommentPost(post)} style={{ cursor: 'pointer' }}>
                                                         <span>💬</span> {post.comments?.[0]?.count || 0}
                                                     </div>
-
-                                                    {isMyPost ? (
-                                                        <div 
-                                                            className="interaction-item delete-trigger action-right" 
-                                                            style={{ cursor: 'pointer', color: '#dc2626' }}
-                                                            onClick={async () => {
-                                                                if (confirm('Are you sure you want to delete this post?')) {
-                                                                    setResults(prev => ({
-                                                                        ...prev,
-                                                                        posts: prev.posts.filter(p => p.id !== post.id)
-                                                                    }));
-                                                                    await fetch(`/api/delete_post?id=${post.id}`, { method: 'DELETE' });
-                                                                }
-                                                            }}
-                                                        >
+                                                    {isMyPost && (
+                                                        <div className="interaction-item delete-trigger action-right" style={{ cursor: 'pointer', color: '#dc2626' }} onClick={async () => {
+                                                            if (confirm('Are you sure you want to delete this post?')) {
+                                                                setResults(prev => ({ ...prev, posts: prev.posts.filter(p => p.id !== post.id) }));
+                                                                await fetch(`/api/delete_post?id=${post.id}`, { method: 'DELETE' });
+                                                            }
+                                                        }}>
                                                             <span>🗑️</span>
-                                                        </div>
-                                                    ) : (
-                                                        /* Render the flag icon for other people's posts matching PostFeed */
-                                                        <div 
-                                                            className="interaction-item report-trigger action-right" 
-                                                            style={{ cursor: 'pointer' }}
-                                                            onClick={() => alert('Post reported successfully.')}
-                                                        >
-                                                            <span>⚠️</span>
                                                         </div>
                                                     )}
                                                 </div>
                                             </article>
                                         );
                                     })}
-
-                                    {/* Limit Footer */}
                                     {results.posts.length >= 10 && (
-                                        <div className="limit-footer">
-                                            <p>Showing the top 10 results. Try a more specific search to find more.</p>
-                                        </div>
+                                        <div className="limit-footer"><p>Showing the top 10 results.</p></div>
                                     )}
                                 </>
                             ) : (
@@ -308,16 +200,18 @@ export default function SearchPage() {
                 </section>
             </div>
 
-            {/* Discussion Tree Render Modal Container */}
             {activeCommentPost && (
-                <CommentsModal 
-                    post={results.posts.find(p => p.id === activeCommentPost.id) || activeCommentPost}
-                    currentUserId={backendUser?.id}
-                    onClose={() => setActiveCommentPost(null)}
-                    onLike={handleSearchPostLike}
-                    onDeletePost={null} 
-                />
+                <CommentsModal post={results.posts.find(p => p.id === activeCommentPost.id) || activeCommentPost} currentUserId={backendUser?.id} onClose={() => setActiveCommentPost(null)} onLike={handleSearchPostLike} onDeletePost={null} />
             )}
         </div>
+    );
+}
+
+// 3. KEEP THIS EXPORT AS THE PRIMARY DEFAULT PATH WRAPPED IN SUSPENSE
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<div className="search-page-layout">Loading search criteria...</div>}>
+            <SearchContent />
+        </Suspense>
     );
 }
