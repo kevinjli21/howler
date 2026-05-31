@@ -43,9 +43,6 @@ export default function UserDropdown({ username }) {
             <Link href="/my-profile" className="dropdown-item">
             My Profile
             </Link>
-            <Link href="/settings" className="dropdown-item">
-            Settings
-            </Link>
             
             <div className="dropdown-divider" />
             
