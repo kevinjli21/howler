@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link'; // CRITICAL IMPORT FOR DIRECTORY ROUTING
 import { getAvatarUrl } from '@/utils/helpers';
 
 export default function CommentsModal({ post, currentUserId, onClose }) {
@@ -19,7 +20,7 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      loading(false);
     }
   };
 
@@ -47,7 +48,7 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
       if (!res.ok) throw new Error(data.error || 'Failed to submit comment');
 
       setComments(prev => [...prev, data]);
-      setNewComment('');
+      newComment('');
       setReplyTo(null);
     } catch (err) {
       setError(err.message);
@@ -79,14 +80,26 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
   const renderCommentBlock = (comment, isReply = false) => {
     const isMyComment = comment.user_id === currentUserId;
     const itemReplies = getRepliesFor(comment.id);
+    
+    // --- COMMENTER DYNAMIC ROUTE GENERATION ---
+    const commenterUsername = comment.profiles?.username || '';
+    const commenterProfileLink = `/profile?username=${encodeURIComponent(commenterUsername)}`;
 
     return (
       <div key={comment.id} className={`expanded-comment-node ${isReply ? 'expanded-nested-reply' : ''}`}>
         <div className="expanded-comment-bubble-wrapper">
-          <img src={getAvatarUrl(comment.profiles?.avatar_url)} alt="avatar" className="commenter-avatar" />
+          {/* Wrap the commenter avatar so it acts as an identity anchor link */}
+          <Link href={commenterProfileLink}>
+            <img src={getAvatarUrl(comment.profiles?.avatar_url)} alt="avatar" className="commenter-avatar" style={{ cursor: 'pointer' }} />
+          </Link>
           <div className="expanded-comment-content-block">
             <div className="expanded-comment-text-bubble">
-              <span className="commenter-username">@{comment.profiles?.username}</span>
+              {/* NAVIGATION LINK FOR COMMENT HANDLES */}
+              <Link href={commenterProfileLink} style={{ textDecoration: 'none' }}>
+                <span className="commenter-username" style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+                  @{comment.profiles?.username || 'anonymous'}
+                </span>
+              </Link>
               <p className="commenter-text">{comment.content}</p>
             </div>
             
@@ -108,9 +121,12 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
     );
   };
 
+  // --- MAIN AUTHOR DYNAMIC ROUTE GENERATION ---
+  const authorUsername = post.profiles?.username || '';
+  const authorProfileLink = `/profile?username=${encodeURIComponent(authorUsername)}`;
+
   return (
     <div className="expanded-modal-overlay" onClick={onClose}>
-      {/* StopPropagation stops the modal from closing when you click inside the actual container box */}
       <div className="expanded-modal-container" onClick={(e) => e.stopPropagation()}>
         
         {/* LEFT COLUMN: Media & Content Focus */}
@@ -118,10 +134,18 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
           <button className="mobile-close-button" onClick={onClose}>&times;</button>
           
           <div className="expanded-media-header">
-            <img src={getAvatarUrl(post.profiles?.avatar_url)} alt="author" className="author-avatar" />
+            {/* Wrap the root post author's image file */}
+            <Link href={authorProfileLink}>
+              <img src={getAvatarUrl(post.profiles?.avatar_url)} alt="author" className="author-avatar" style={{ cursor: 'pointer' }} />
+            </Link>
             <div className="author-meta">
-              <strong>{post.profiles?.full_name}</strong>
-              <span>@{post.profiles?.username}</span>
+              {/* NAVIGATION LINK FOR POST AUTHOR DETAILS */}
+              <Link href={authorProfileLink} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <strong style={{ cursor: 'pointer' }}>{post.profiles?.full_name}</strong>
+              </Link>
+              <Link href={authorProfileLink} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <span style={{ cursor: 'pointer', color: '#64748b' }}>@{post.profiles?.username}</span>
+              </Link>
             </div>
             {post.categories?.category_name && (
               <span 

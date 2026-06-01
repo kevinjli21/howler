@@ -404,9 +404,8 @@ export default function MyProfile() {
                             <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '2rem' }}>You haven't liked any posts yet!</p>
                         ) : (
                             likedPosts.map(post => {
-                                // --- CRITICAL FIX: Generate the dynamic dynamic link using the post author's profile username ---
                                 const authorUsername = post.profiles?.username || '';
-                                const profileLink = `/profile?username=${encodeURIComponent(authorUsername)}`;
+                                const profileLink = `/profile/${encodeURIComponent(authorUsername)}`;
 
                                 return (
                                     <article key={post.id} className="post-card" style={{ marginBottom: '1rem', border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '8px', position: 'relative' }}>
