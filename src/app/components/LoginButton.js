@@ -10,7 +10,7 @@ export default function LoginButtons() {
       provider: 'google',
       options: {
         // FORCES LOCALHOST FOR GOOGLE
-        redirectTo: `http://localhost:3000/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/`,
         queryParams: { hd: 'uw.edu' }
       },
     });
@@ -22,7 +22,7 @@ export default function LoginButtons() {
       provider: 'azure',
       options: {
         // FORCES LOCALHOST FOR AZURE (Restores the ?next=/ token your route handler expects)
-        redirectTo: `http://localhost:3000/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/`,
         scopes: 'email openid profile', // Enforces email retrieval from UW NetID profiles
       },
     });
