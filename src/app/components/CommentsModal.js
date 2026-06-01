@@ -82,7 +82,7 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
     const itemReplies = getRepliesFor(comment.id);
     
     const commenterUsername = comment.profiles?.username || '';
-    const commenterProfileLink = `/profile?username=${encodeURIComponent(commenterUsername)}`;
+    const commenterProfileLink = `/profile/${encodeURIComponent(commenterUsername)}`;
 
     return (
       <div key={comment.id} className={`expanded-comment-node ${isReply ? 'expanded-nested-reply' : ''}`}>
