@@ -1,12 +1,12 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react'; // 1. Added Suspense import
+import { useEffect, useState, Suspense } from 'react'; 
 import Link from 'next/link';
 import UserDropdown from '../components/UserDropdown';
 import CommentsModal from '../components/CommentsModal'; 
 import { getAvatarUrl } from '@/utils/helpers';
+import ReportModal from '../components/ReportModal';
 
-// 2. RENAME YOUR MAIN BODY COMPONENT TO "SearchContent"
 function SearchContent() {
     const searchParams = useSearchParams();
     const [backendUser, setBackendUser] = useState(null);
@@ -14,6 +14,7 @@ function SearchContent() {
     const [results, setResults] = useState({ profiles: [], posts: [] });
     const [loading, setLoading] = useState(true);
     const [activeCommentPost, setActiveCommentPost] = useState(null);
+    const [reportingPost, setReportingPost] = useState(null);
 
     useEffect(() => {
         if (query) {
@@ -38,6 +39,7 @@ function SearchContent() {
                 if (res.ok) {
                     const data = await res.json();
                     setBackendUser(data);
+                    console.log("Authenticated user:", data);
                 }
             } catch (err) {
                 console.error("Auth fetch failed", err);
@@ -111,7 +113,7 @@ function SearchContent() {
                     <div className="search-user-list">
                         {results.profiles.length > 0 ? (
                             results.profiles.map(user => {
-                                const targetUserPath = backendUser && user.id === backendUser.id ? '/myprofile' : `/profile/${user.username}`;
+                                const targetUserPath = backendUser && user.id === backendUser.id ? '/my-profile' : `/profile/${user.username}`;
                                 return (
                                     <Link href={targetUserPath} key={user.id} className="search-user-card" style={{ textDecoration: 'none', color: 'inherit', display: 'flex' }}>
                                         <img src={getAvatarUrl(user.avatar_url)} alt={user.username} className="profile-avatar-large" />
@@ -174,14 +176,23 @@ function SearchContent() {
                                                     <div className="interaction-item" onClick={() => setActiveCommentPost(post)} style={{ cursor: 'pointer' }}>
                                                         <span>💬</span> {post.comments?.[0]?.count || 0}
                                                     </div>
-                                                    {isMyPost && (
-                                                        <div className="interaction-item delete-trigger action-right" style={{ cursor: 'pointer', color: '#dc2626' }} onClick={async () => {
-                                                            if (confirm('Are you sure you want to delete this post?')) {
-                                                                setResults(prev => ({ ...prev, posts: prev.posts.filter(p => p.id !== post.id) }));
-                                                                await fetch(`/api/delete_post?id=${post.id}`, { method: 'DELETE' });
-                                                            }
-                                                        }}>
-                                                            <span>🗑️</span>
+                                                    {isMyPost ? (
+                                                        <div 
+                                                        className="interaction-item delete-trigger action-right" 
+                                                        onClick={() => handleDelete(post.id)}
+                                                        title="Delete your post"
+                                                        style={{ cursor: 'pointer', color: '#dc2626' }}
+                                                        >
+                                                        <span>🗑️</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div 
+                                                        className="interaction-item report-trigger action-right" 
+                                                        onClick={() => setReportingPost(post)}
+                                                        title="Report this post"
+                                                        style={{ cursor: 'pointer' }}
+                                                        >
+                                                        <span>⚠️</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -203,11 +214,17 @@ function SearchContent() {
             {activeCommentPost && (
                 <CommentsModal post={results.posts.find(p => p.id === activeCommentPost.id) || activeCommentPost} currentUserId={backendUser?.id} onClose={() => setActiveCommentPost(null)} onLike={handleSearchPostLike} onDeletePost={null} />
             )}
+
+            {reportingPost && (
+                <ReportModal 
+                post={reportingPost} 
+                onClose={() => setReportingPost(null)} 
+                />
+            )}
         </div>
     );
 }
 
-// 3. KEEP THIS EXPORT AS THE PRIMARY DEFAULT PATH WRAPPED IN SUSPENSE
 export default function SearchPage() {
     return (
         <Suspense fallback={<div className="search-page-layout">Loading search criteria...</div>}>

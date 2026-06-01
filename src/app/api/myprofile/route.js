@@ -16,6 +16,7 @@ export async function GET() {
   const { data, error } = await supabase
     .from('profiles')
     .select(`
+      id,
       username, 
       full_name, 
       avatar_url, 

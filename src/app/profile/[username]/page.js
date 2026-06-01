@@ -5,6 +5,7 @@ import Link from 'next/link';
 import CommentsModal from '../../components/CommentsModal'; 
 import UserDropdown from '../../components/UserDropdown'; 
 import { getAvatarUrl } from '@/utils/helpers';
+import ReportModal from '../../components/ReportModal';
 
 export default function OtherProfilePage() {
   const { username } = useParams();
@@ -14,6 +15,7 @@ export default function OtherProfilePage() {
   const [currentUserId, setCurrentUserId] = useState(null);
   const [navbarUser, setNavbarUser] = useState(null);
   const [activeCommentPost, setActiveCommentPost] = useState(null);
+  const [reportingPost, setReportingPost] = useState(null);
 
   useEffect(() => {
     const fetchCurrentSession = async () => {
@@ -232,19 +234,24 @@ export default function OtherProfilePage() {
                       <span>💬</span> {post.comments?.[0]?.count || 0}
                     </div>
                     
-                    {isMyPost && (
-                      <div 
+                    {isMyPost ? (
+                        <div 
                         className="interaction-item delete-trigger action-right" 
+                        onClick={() => handleDelete(post.id)}
+                        title="Delete your post"
                         style={{ cursor: 'pointer', color: '#dc2626' }}
-                        onClick={async () => {
-                          if (confirm('Are you sure you want to delete this post?')) {
-                            setUserPosts(prev => prev.filter(p => p.id !== post.id));
-                            await fetch(`/api/delete_post?id=${post.id}`, { method: 'DELETE' });
-                          }
-                        }}
-                      >
+                        >
                         <span>🗑️</span>
-                      </div>
+                        </div>
+                    ) : (
+                        <div 
+                        className="interaction-item report-trigger action-right" 
+                        onClick={() => setReportingPost(post)}
+                        title="Report this post"
+                        style={{ cursor: 'pointer' }}
+                        >
+                        <span>⚠️</span>
+                        </div>
                     )}
                   </div>
                 </article>
@@ -263,6 +270,13 @@ export default function OtherProfilePage() {
           onLike={handleOtherProfileLike} 
           onDeletePost={null} 
         />
+      )}
+
+      {reportingPost && (
+          <ReportModal 
+          post={reportingPost} 
+          onClose={() => setReportingPost(null)} 
+          />
       )}
     </div>
   );

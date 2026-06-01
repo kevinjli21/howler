@@ -1,26 +1,42 @@
 'use client';
 import { createClient } from '@/utils/supabase/client';
 
-export default function LoginButton() {
+export default function LoginButtons() {
   const supabase = createClient();
 
-  const handleLogin = async () => {
+  // --- GOOGLE SIGN IN ---
+  const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        // 1. Keeps your original, automatic domain utility with the critical ?next=/ parameter
-        redirectTo: `${window.location.origin}/auth/callback?next=/`,
-        // queryParams: {
-        //   // 2. Restricts the OAuth portal strictly to UW student/faculty email domains
-        //   hd: 'uw.edu'
-        // }
+        // FORCES LOCALHOST FOR GOOGLE
+        redirectTo: `http://localhost:3000/auth/callback`,
+        queryParams: { hd: 'uw.edu' }
+      },
+    });
+  };
+
+  // --- AZURE SIGN IN ---
+  const handleAzureLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'azure',
+      options: {
+        // FORCES LOCALHOST FOR AZURE (Restores the ?next=/ token your route handler expects)
+        redirectTo: `http://localhost:3000/auth/callback`,
+        scopes: 'email openid profile', // Enforces email retrieval from UW NetID profiles
       },
     });
   };
 
   return (
-    <button className="google-btn" onClick={handleLogin}>
-      Sign in with Google
-    </button>
+    <div className="auth-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <button className="google-btn" onClick={handleGoogleLogin}>
+        Sign in with Google
+      </button>
+
+      <button className="google-btn" onClick={handleAzureLogin}>
+        Sign in with Azure
+      </button>
+    </div>
   );
 }
