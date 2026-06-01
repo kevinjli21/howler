@@ -351,7 +351,6 @@ export default function MyProfile() {
                                 return (
                                     <article key={post.id} className="post-card" style={{ marginBottom: '1rem', border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '8px', position: 'relative' }}>
                                         
-                                        {/* Added Category Badge Rendering Configuration Option */}
                                         {post.categories?.category_name && (
                                             <span 
                                                 className="category-badge"
@@ -404,50 +403,71 @@ export default function MyProfile() {
                         ) : likedPosts.length === 0 ? (
                             <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '2rem' }}>You haven't liked any posts yet!</p>
                         ) : (
-                            likedPosts.map(post => (
-                                <article key={post.id} className="post-card" style={{ marginBottom: '1rem', border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '8px', position: 'relative' }}>
-                                    {post.categories?.category_name && (
-                                        <span 
-                                            className="category-badge"
-                                            style={{ backgroundColor: post.categories.color || '#4b5563', color: '#ffffff', position: 'absolute', top: '1rem', right: '1rem', padding: '0.2rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: '600' }}
-                                        >
-                                            {post.categories.category_name}
-                                        </span>
-                                    )}
+                            likedPosts.map(post => {
+                                // --- CRITICAL FIX: Generate the dynamic dynamic link using the post author's profile username ---
+                                const authorUsername = post.profiles?.username || '';
+                                const profileLink = `/profile?username=${encodeURIComponent(authorUsername)}`;
 
-                                    <div className="post-header" style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-                                        {post.profiles?.avatar_url && (
-                                            <img 
-                                                src={getAvatarUrl(post.profiles.avatar_url)} 
-                                                alt="avatar" 
-                                                style={{ width: '32px', height: '32px', borderRadius: '50%', marginRight: '0.5rem', objectFit: 'cover' }}
-                                            />
+                                return (
+                                    <article key={post.id} className="post-card" style={{ marginBottom: '1rem', border: '1px solid #e2e8f0', padding: '1rem', borderRadius: '8px', position: 'relative' }}>
+                                        {post.categories?.category_name && (
+                                            <span 
+                                                className="category-badge"
+                                                style={{ backgroundColor: post.categories.color || '#4b5563', color: '#ffffff', position: 'absolute', top: '1rem', right: '1rem', padding: '0.2rem 0.6rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: '600' }}
+                                            >
+                                                {post.categories.category_name}
+                                            </span>
                                         )}
-                                        <strong>{post.profiles?.full_name || 'Anonymous'}</strong>
-                                        <span style={{ color: '#64748b', marginLeft: '0.25rem', fontSize: '0.85rem' }}>@{post.profiles?.username}</span>
-                                    </div>
-                                    
-                                    <p style={{ margin: '0.5rem 0', color: '#0f172a', lineBreak: 'anywhere' }}>{post.content}</p>
-                                    
-                                    {post.image_url && (
-                                        <img src={post.image_url} alt="Post attachment" style={{ maxWidth: '100%', borderRadius: '6px', marginTop: '0.5rem', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
-                                    )}
-                                    
-                                    <div className="post-interactions" style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', alignItems: 'center', fontSize: '0.95rem' }}>
-                                        <div onClick={() => handleProfileUnlike(post)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }} title="Unlike this post">
-                                            <span style={{ color: '#ff4b4b' }}>❤️</span>
-                                            <span style={{ color: '#4b5563' }}>{post.likes?.[0]?.count || 0}</span>
+
+                                        <div className="post-header" style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            {post.profiles?.avatar_url && (
+                                                <img 
+                                                    src={getAvatarUrl(post.profiles.avatar_url)} 
+                                                    alt="avatar" 
+                                                    style={{ width: '32px', height: '32px', borderRadius: '50%', marginRight: '0.5rem', objectFit: 'cover' }}
+                                                />
+                                            )}
+                                            <h3 className="post-author" style={{ margin: 0, fontSize: '1rem' }}>
+                                                {/* Wrap full name in dynamic Next.js Link option */}
+                                                <Link href={profileLink} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                                    <span style={{ fontWeight: 'bold', cursor: 'pointer' }} className="hover:underline">
+                                                        {post.profiles?.full_name || 'Anonymous'}
+                                                    </span>
+                                                </Link>
+                                                
+                                                {/* Wrap username handle in dynamic Next.js Link option */}
+                                                {post.profiles?.username && (
+                                                    <Link href={profileLink} style={{ textDecoration: 'none' }}>
+                                                        <span className="post-username" style={{ color: '#64748b', marginLeft: '0.25rem', fontSize: '0.85rem', cursor: 'pointer' }}>
+                                                            @{post.profiles.username}
+                                                        </span>
+                                                    </Link>
+                                                )}
+                                            </h3>
                                         </div>
-                                        <div onClick={() => setActiveCommentPost(post)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#4b5563' }} title="View discussion threads">
-                                            <span>💬</span> 
-                                            <span>{post.comments?.[0]?.count || 0}</span>
+                                        
+                                        <p style={{ margin: '0.5rem 0', color: '#0f172a', lineBreak: 'anywhere' }}>{post.content}</p>
+                                        
+                                        {post.image_url && (
+                                            <img src={post.image_url} alt="Post attachment" style={{ maxWidth: '100%', borderRadius: '6px', marginTop: '0.5rem', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
+                                        )}
+                                        
+                                        <div className="post-interactions" style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', alignItems: 'center', fontSize: '0.95rem' }}>
+                                            <div onClick={() => handleProfileUnlike(post)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem' }} title="Unlike this post">
+                                                <span style={{ color: '#ff4b4b' }}>❤️</span>
+                                                <span style={{ color: '#4b5563' }}>{post.likes?.[0]?.count || 0}</span>
+                                            </div>
+                                            <div onClick={() => setActiveCommentPost(post)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.35rem', color: '#4b5563' }} title="View discussion threads">
+                                                <span>💬</span> 
+                                                <span>{post.comments?.[0]?.count || 0}</span>
+                                            </div>
+                                            <small style={{ marginLeft: 'auto', color: '#64748b' }}>
+                                                {new Date(post.posted_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                                            </small>
                                         </div>
-                                        <small style={{ marginLeft: 'auto', color: '#64748b' }}>
-                                            {new Date(post.posted_at).toLocaleDateString([], { month: 'short', day: 'numeric' })}
-                                        </small>
-                                    </div>
-                                </article>
-                            ))
+                                    </article>
+                                );
+                            })
                         )}
                     </div>
                 )}
