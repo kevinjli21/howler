@@ -37,9 +37,4 @@ Data is persisted in a Supabase PostgreSQL instance. The schema enforces relatio
 * Node.js (v18 or higher)
 * A Supabase project instance
 
-### Installation
 
-1. Clone the repository:
-```bash
-   git clone [https://github.com/your-username/howler.git](https://github.com/your-username/howler.git)
-   cd howler
