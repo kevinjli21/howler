@@ -29,12 +29,4 @@ The application utilizes Next.js Server Actions to handle form submissions and d
 ### Database Schema
 Data is persisted in a Supabase PostgreSQL instance. The schema enforces relational integrity with explicit foreign key constraints mapping user profiles to posts and comments, ensuring performant joins and data consistency.
 
----
-
-## Getting Started
-
-### Prerequisites
-* Node.js (v18 or higher)
-* A Supabase project instance
-
 
