@@ -75,7 +75,7 @@ const handleSearch = (e) => {
           <h1 className='site-title'>Howler</h1>
           <div className="divider" />
           <div className='welcome'>
-            <p className='instructions'>Please log in with your UW Google account.</p>
+            <p className='instructions'>Please log in with your UW account.</p>
             <LoginButton />
           </div>
         </div>
