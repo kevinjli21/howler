@@ -28,11 +28,6 @@ body {
   align-items:center;
   gap: 24px;
   min-height: 100vh;
-  background-image: url(/imgs/Signature_Center_White.png);
-  background-repeat: no-repeat;
-  background-position: center 20%;
-  background-size: 600px;
-  
 }
 
 .divider {
