@@ -16,8 +16,8 @@ export default function LoginButtons() {
     });
   };
 
-  // --- AZURE SIGN IN ---
-  const handleAzureLogin = async () => {
+  // --- MICROSOFT SIGN IN ---
+  const handleMicrosoftLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
@@ -34,8 +34,8 @@ export default function LoginButtons() {
         Sign in with Google
       </button>
 
-      <button className="google-btn" onClick={handleAzureLogin}>
-        Sign in with Azure
+      <button className="google-btn" onClick={handleMicrosoftLogin}>
+        Sign in with Microsoft
       </button>
     </div>
   );
