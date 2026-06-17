@@ -24,7 +24,7 @@ export default function LoginButtons() {
         // FORCES LOCALHOST FOR AZURE (Restores the ?next=/ token your route handler expects)
         redirectTo: 'https://howler-teal.vercel.app/auth/callback?next=/',
         scopes: 'email openid profile', // Enforces email retrieval from UW NetID profiles
-        queryParams: { hd: 'uw.edu' }
+        tenant: 'f6b6dd5b-f02f-441a-99a0-162ac5060bd2', // UW's Azure tenant ID
       },
     });
   };
