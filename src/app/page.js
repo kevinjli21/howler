@@ -40,32 +40,55 @@ const handleSearch = (e) => {
 };
 
   return (
-    // Logged in view
     <main>
       {backendUser?.authenticated ? (
         <div className='signed-in'>
-          <nav className='navbar'>
-            <Link href="/" className='logo-link-wrapper'>
-              <div className='logo-container'>
-                <img className='logo' src="/icon.png" alt="Howler Logo" />
-                <h1 className='signed-in-title'>Howler</h1>
+          <aside className='sidebar'>
+            <div className='sidebar-top'>
+              <Link href="/" className='logo-link-wrapper'>
+                <div className='sidebar-logo'>
+                  <img className='logo' src="/icon.png" alt="Howler Logo" />
+                  <h1 className='signed-in-title sidebar-title'>Howler</h1>
+                </div>
+              </Link>
+
+              <div className='sidebar-search'>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className='search-bar'
+                  onKeyDown={handleSearch}
+                />
               </div>
-            </Link>
-            <div className='search-container'>
-              <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
+
+              <nav className='sidebar-nav'>
+                <Link href="/" className='nav-item nav-item-active'>
+                  <span>🏠</span><span>Home</span>
+                </Link>
+                <Link href="/my-profile" className='nav-item'>
+                  <span>👤</span><span>Profile</span>
+                </Link>
+              </nav>
+
+              <button className="howl-btn" onClick={() => setIsModalOpen(true)}>
+                Howl
+              </button>
             </div>
-            <div className='user-info-container'>
-                <button 
-                  className="create-post-btn"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  Howl
-                </button>
-                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
-                <UserDropdown username={backendUser.full_name} />
+
+            <div className='sidebar-user-section'>
+              <img
+                src={getAvatarUrl(backendUser.avatar_url)}
+                alt="Profile"
+                className='sidebar-avatar'
+              />
+              <UserDropdown username={backendUser.full_name} />
             </div>
-          </nav>
-          <div className='post-section'>
+          </aside>
+
+          <div className='main-feed-area'>
+            <div className='feed-sticky-header'>
+              <h2 className='feed-heading'>Home</h2>
+            </div>
             <PostFeed />
           </div>
         </div>
