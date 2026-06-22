@@ -11,6 +11,7 @@ import { useAuth } from './components/AuthContext';
 export default function Home() {
   const { user, loading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [feedKey, setFeedKey] = useState(0);
 
   if (loading) {
     return <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -77,7 +78,7 @@ export default function Home() {
             <div className='feed-sticky-header'>
               <h2 className='feed-heading'>Home</h2>
             </div>
-            <PostFeed />
+            <PostFeed key={feedKey} />
           </div>
         </div>
       ) : (
@@ -94,7 +95,7 @@ export default function Home() {
         <CreatePostForm
           onPostCreated={() => {
               setIsModalOpen(false);
-              window.location.reload();
+              setFeedKey(k => k + 1);
           }}
           onCancel={() => {
               setIsModalOpen(false);
