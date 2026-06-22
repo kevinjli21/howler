@@ -10,20 +10,21 @@ export default function LoginButtons() {
       provider: 'google',
       options: {
         // FORCES LOCALHOST FOR GOOGLE
-        redirectTo: `${window.location.origin}/auth/callback?next=/`,
+        redirectTo: 'https://howler-teal.vercel.app/auth/callback?next=/',
         queryParams: { hd: 'uw.edu' }
       },
     });
   };
 
-  // --- AZURE SIGN IN ---
-  const handleAzureLogin = async () => {
+  // --- MICROSOFT SIGN IN ---
+  const handleMicrosoftLogin = async () => {
     await supabase.auth.signInWithOAuth({
       provider: 'azure',
       options: {
         // FORCES LOCALHOST FOR AZURE (Restores the ?next=/ token your route handler expects)
-        redirectTo: `${window.location.origin}/auth/callback?next=/`,
+        redirectTo: 'https://howler-teal.vercel.app/auth/callback?next=/',
         scopes: 'email openid profile', // Enforces email retrieval from UW NetID profiles
+        tenant: 'f6b6dd5b-f02f-441a-99a0-162ac5060bd2', // UW's Azure tenant ID
       },
     });
   };
@@ -34,8 +35,8 @@ export default function LoginButtons() {
         Sign in with Google
       </button>
 
-      <button className="google-btn" onClick={handleAzureLogin}>
-        Sign in with Azure
+      <button className="google-btn" onClick={handleMicrosoftLogin}>
+        Sign in with Microsoft
       </button>
     </div>
   );
