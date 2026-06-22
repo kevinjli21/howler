@@ -27,7 +27,6 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
-  max-width: 1100px;
   margin: 0 auto;
 }
 
