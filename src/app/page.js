@@ -14,7 +14,7 @@ export default function Home() {
 
   if (loading) {
     return <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <p style={{ color: 'white' }}>Loading your profile...</p>
+      <p style={{ color: 'white' }}>Loading home feed...</p>
     </div>;
   }
 

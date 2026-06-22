@@ -91,7 +91,7 @@ export default function OtherProfilePage() {
   if (loading) {
     return (
       <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'white' }}>Loading profile...</p>
+        <p style={{ color: 'white' }}>Loading @{username}&apos;s profile...</p>
       </div>
     );
   }

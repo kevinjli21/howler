@@ -191,10 +191,8 @@ function SearchContent() {
 export default function SearchPage() {
     return (
         <Suspense fallback={
-            <div className='signed-in'>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                    Loading...
-                </div>
+            <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <p style={{ color: 'white' }}>Loading search results...</p>
             </div>
         }>
             <SearchContent />
