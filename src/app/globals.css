@@ -124,10 +124,11 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 35px 8px;
+  padding: 10px 8px;
   border-radius: 30px;
   transition: background-color 0.2s;
   position: relative;
+  top: -15px;
 }
 
 .sidebar-user-section:hover {
