@@ -4,17 +4,19 @@ import Link from 'next/link';
 import Sidebar from '../components/Sidebar';
 import CommentsModal from '../components/CommentsModal';
 import { getAvatarUrl } from '@/utils/helpers';
+import { useAuth } from '../components/AuthContext';
 
 export default function MyProfile() {
-    const [backendUser, setBackendUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const { user: contextUser, setUser: setContextUser } = useAuth();
+    const [backendUser, setBackendUser] = useState(contextUser);
+    const [loading, setLoading] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [campuses, setCampuses] = useState([]);
     const [error, setError] = useState('');
     const [formData, setFormData] = useState({
-        username: '',
-        bio: '',
-        campus_id: ''
+        username: contextUser?.username || '',
+        bio: contextUser?.bio || '',
+        campus_id: contextUser?.campus_id || ''
     });
 
     const [activeTab, setActiveTab] = useState('posts');
@@ -25,33 +27,10 @@ export default function MyProfile() {
     const [activeCommentPost, setActiveCommentPost] = useState(null);
 
     useEffect(() => {
-        async function fetchProfileAndCampuses() {
-            try {
-                const [profileRes, campusRes] = await Promise.all([
-                    fetch('/api/myprofile'),
-                    fetch('/api/campuses')
-                ]);
-
-                if (profileRes.ok && campusRes.ok) {
-                    const profileData = await profileRes.json();
-                    const campusData = await campusRes.json();
-
-                    setBackendUser(profileData);
-                    setCampuses(campusData || []);
-
-                    setFormData({
-                        username: profileData.username || '',
-                        bio: profileData.bio || '',
-                        campus_id: profileData.campus_id || ''
-                    });
-                }
-            } catch (err) {
-                console.error("Initialization failed", err);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchProfileAndCampuses();
+        fetch('/api/campuses')
+            .then(res => res.ok ? res.json() : [])
+            .then(data => setCampuses(data || []))
+            .catch(err => console.error("Failed to load campuses", err));
     }, []);
 
     const fetchLikedPosts = () => {
@@ -164,6 +143,7 @@ export default function MyProfile() {
 
             if (res.ok) {
                 setBackendUser(data);
+                setContextUser(data);
                 setIsEditing(false);
             } else {
                 throw new Error(data.error || 'Failed to update profile changes.');

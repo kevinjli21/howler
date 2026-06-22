@@ -6,10 +6,11 @@ import Sidebar from '../components/Sidebar';
 import CommentsModal from '../components/CommentsModal';
 import { getAvatarUrl } from '@/utils/helpers';
 import ReportModal from '../components/ReportModal';
+import { useAuth } from '../components/AuthContext';
 
 function SearchContent() {
     const searchParams = useSearchParams();
-    const [backendUser, setBackendUser] = useState(null);
+    const { user: backendUser } = useAuth();
     const query = searchParams.get('q');
     const [results, setResults] = useState({ profiles: [], posts: [] });
     const [loading, setLoading] = useState(true);
@@ -31,21 +32,6 @@ function SearchContent() {
                 });
         }
     }, [query]);
-
-    useEffect(() => {
-        async function fetchMyAuth() {
-            try {
-                const res = await fetch('/api/myprofile');
-                if (res.ok) {
-                    const data = await res.json();
-                    setBackendUser(data);
-                }
-            } catch (err) {
-                console.error("Auth fetch failed", err);
-            }
-        }
-        fetchMyAuth();
-    }, []);
 
     const handleSearchPostLike = async (post) => {
         if (!backendUser) return;
@@ -205,10 +191,8 @@ function SearchContent() {
 export default function SearchPage() {
     return (
         <Suspense fallback={
-            <div className='signed-in'>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-                    Loading...
-                </div>
+            <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
+                <p style={{ color: 'white' }}>Loading search results...</p>
             </div>
         }>
             <SearchContent />
