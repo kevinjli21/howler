@@ -748,12 +748,9 @@ body {
 }
 
 .my-profile-container {
-    max-width: 600px;
-    margin: 2rem auto;
     padding: 20px;
     background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    min-height: 100%;
 }
 
 .profile-header {
@@ -875,10 +872,16 @@ body {
   padding: 20px;
 }
 
+.search-feed-content {
+  padding: 20px;
+  background: white;
+  min-height: 100%;
+}
+
 .results-heading {
   font-size: 1.8rem;
   font-weight: 800;
-  color: lightgrey; /* Deep near-black for maximum clarity */
+  color: #1a1a1a;
   margin-bottom: 30px;
 }
 
@@ -929,7 +932,7 @@ body {
 }
 
 .no-results-text {
-  color: lightgrey;
+  color: #94a3b8;
   font-size: 0.95rem;
   padding: 10px 0;
 }
