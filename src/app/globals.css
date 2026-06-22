@@ -25,7 +25,8 @@ body {
 /* ── Signed-in shell ─────────────────────────────── */
 .signed-in {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   max-width: 1100px;
   margin: 0 auto;
 }
@@ -126,13 +127,6 @@ body {
   gap: 10px;
   padding: 10px 8px;
   border-radius: 30px;
-  transition: background-color 0.2s;
-  position: relative;
-  top: -22px;
-}
-
-.sidebar-user-section:hover {
-  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .sidebar-avatar {
@@ -143,36 +137,15 @@ body {
   flex-shrink: 0;
 }
 
-.sidebar-user-section .dropdown-trigger {
-  background: transparent;
-  border: none;
-  color: white;
-  width: 140px;
-  height: auto;
-  padding: 4px 8px;
-  box-shadow: none;
-  font-size: 0.9rem;
-}
-
-.sidebar-user-section .dropdown-trigger:hover {
-  background: transparent;
-}
-
-.sidebar-user-section .dropdown-menu {
-  position: absolute;
-  bottom: calc(100% + 8px);
-  left: 0;
-  right: auto;
-  margin-top: 0;
-}
-
 /* ── Main feed area ───────────────────────────────── */
 .main-feed-area {
   flex: 1;
   min-width: 0;
-  max-width: 600px;
+  max-width: 650px;
   border-left: 1px solid rgba(255, 255, 255, 0.18);
   border-right: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0px 15px;
+  overflow-y: auto;
 }
 
 .feed-sticky-header {

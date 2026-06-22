@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import LoginButton from './components/LoginButton';
 import PostModal from './components/PostModal';
 import CreatePostForm from './components/CreatePostForm';
-import UserDropdown from './components/UserDropdown';
 import PostFeed from './components/PostFeed';
 import Link from 'next/link';
 import { getAvatarUrl } from '@/utils/helpers';
@@ -81,7 +80,9 @@ const handleSearch = (e) => {
                 alt="Profile"
                 className='sidebar-avatar'
               />
-              <UserDropdown username={backendUser.full_name} />
+              <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
+                {backendUser.full_name}
+              </span>
             </div>
           </aside>
 

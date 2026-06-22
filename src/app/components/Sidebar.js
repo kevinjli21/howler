@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { getAvatarUrl } from '@/utils/helpers';
-import UserDropdown from './UserDropdown';
 import PostModal from './PostModal';
 import CreatePostForm from './CreatePostForm';
 
@@ -58,7 +57,9 @@ export default function Sidebar({ user, activeNav = '' }) {
             alt="Profile"
             className='sidebar-avatar'
           />
-          <UserDropdown username={user?.full_name || 'User'} />
+          <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
+            {user?.full_name || 'User'}
+          </span>
         </div>
       </aside>
 
