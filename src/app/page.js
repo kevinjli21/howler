@@ -12,7 +12,11 @@ export default function Home() {
   const { user, loading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  if (loading) return <p>Refreshing page...</p>;
+  if (loading) {
+    return <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'white' }}>Loading your profile...</p>
+    </div>;
+  }
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
