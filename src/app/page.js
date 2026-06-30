@@ -1,48 +1,36 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import LoginButton from './components/LoginButton';
 import PostModal from './components/PostModal';
 import CreatePostForm from './components/CreatePostForm';
-import UserDropdown from './components/UserDropdown';
 import PostFeed from './components/PostFeed';
 import MessagesPanel from './components/MessagesPanel';
 import Link from 'next/link';
 import { getAvatarUrl } from '@/utils/helpers';
+import { useAuth } from './components/AuthContext';
 
 export default function Home() {
-  const [backendUser, setBackendUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user, loading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('feed');
+  const [feedKey, setFeedKey] = useState(0);
 
-  useEffect(() => {
-    async function checkBackendAuth() {
-      try {
-        const res = await fetch('/api/auth');
-        if (res.ok) {
-          const data = await res.json();
-          setBackendUser(data);
-        }
-      } catch (err) {
-        console.error('Backend check failed', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    checkBackendAuth();
-  }, []);
-
-  if (loading) return <p>Refreshing page...</p>;
+  if (loading) {
+    return <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ color: 'white' }}>Loading home feed...</p>
+    </div>;
+  }
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
-      window.location.href = `/search?q=${encodeURIComponent(e.target.value)}`;
+      const query = e.target.value;
+      window.location.href = `/search?q=${encodeURIComponent(query)}`;
     }
   };
 
   return (
     <main>
-      {backendUser?.authenticated ? (
+      {user ? (
         <div className="app-shell">
           {/* Left Sidebar */}
           <aside className="left-sidebar">
@@ -74,8 +62,10 @@ export default function Home() {
                 Howl
               </button>
               <div className="sidebar-user-row">
-                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className="profile-pic" />
-                <UserDropdown username={backendUser.full_name} />
+                <img src={getAvatarUrl(user.avatar_url)} alt="Profile" className="profile-pic" />
+                <span className="truncate-text" style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
+                  {user.full_name}
+                </span>
               </div>
             </div>
           </aside>
@@ -91,20 +81,20 @@ export default function Home() {
               />
             </div>
             <div className="post-section">
-              <PostFeed />
+              <PostFeed key={feedKey} />
             </div>
           </div>
 
           {/* Right Panel — DMs */}
           {activeSection === 'messages' && (
             <aside className="right-panel">
-              <MessagesPanel currentUserId={backendUser.id} />
+              <MessagesPanel currentUserId={user.id} />
             </aside>
           )}
         </div>
       ) : (
-        <div className="signed-out">
-          <h1 className="site-title">Howler</h1>
+        <div className='signed-out'>
+          <h1 className='site-title'>Howler</h1>
           <div className="divider" />
           <div className="welcome">
             <p className="instructions">Please log in with your UW account.</p>
@@ -115,7 +105,10 @@ export default function Home() {
 
       <PostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <CreatePostForm
-          onPostCreated={() => { setIsModalOpen(false); window.location.reload(); }}
+          onPostCreated={() => {
+            setIsModalOpen(false);
+            setFeedKey(k => k + 1);
+          }}
           onCancel={() => setIsModalOpen(false)}
         />
       </PostModal>
