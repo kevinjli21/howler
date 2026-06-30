@@ -1438,6 +1438,9 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .left-sidebar {
@@ -1519,7 +1522,6 @@ body {
 .center-content {
   flex: 1;
   min-width: 0;
-  max-width: 800px;
   overflow-y: auto;
   height: 100vh;
   background: var(--background);
