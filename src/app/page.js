@@ -5,6 +5,7 @@ import PostModal from './components/PostModal';
 import CreatePostForm from './components/CreatePostForm';
 import UserDropdown from './components/UserDropdown';
 import PostFeed from './components/PostFeed';
+import MessagesPanel from './components/MessagesPanel';
 import Link from 'next/link';
 import { getAvatarUrl } from '@/utils/helpers';
 
@@ -12,83 +13,110 @@ export default function Home() {
   const [backendUser, setBackendUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('feed');
+
   useEffect(() => {
     async function checkBackendAuth() {
       try {
         const res = await fetch('/api/auth');
         if (res.ok) {
           const data = await res.json();
-          console.log("Backend auth check response:", data);
           setBackendUser(data);
         }
       } catch (err) {
-        console.error("Backend check failed", err);
+        console.error('Backend check failed', err);
       } finally {
         setLoading(false);
       }
     }
     checkBackendAuth();
-  }, []); // Check for auth from backend when initially loading
+  }, []);
 
   if (loading) return <p>Refreshing page...</p>;
 
-const handleSearch = (e) => {
-  if (e.key === 'Enter') {
-    const query = e.target.value;
-    window.location.href = `/search?q=${encodeURIComponent(query)}`;
-  }
-};
+  const handleSearch = (e) => {
+    if (e.key === 'Enter') {
+      window.location.href = `/search?q=${encodeURIComponent(e.target.value)}`;
+    }
+  };
 
   return (
-    // Logged in view
     <main>
       {backendUser?.authenticated ? (
-        <div className='signed-in'>
-          <nav className='navbar'>
-            <Link href="/" className='logo-link-wrapper'>
-              <div className='logo-container'>
-                <img className='logo' src="/icon.png" alt="Howler Logo" />
-                <h1 className='signed-in-title'>Howler</h1>
-              </div>
+        <div className="app-shell">
+          {/* Left Sidebar */}
+          <aside className="left-sidebar">
+            <Link href="/" className="logo-link-wrapper sidebar-logo-wrap">
+              <img className="logo" src="/icon.png" alt="Howler Logo" />
+              <h1 className="signed-in-title">Howler</h1>
             </Link>
-            <div className='search-container'>
-              <input type="text" placeholder="Search for posts or users..." className='search-bar' onKeyDown={handleSearch}/>
-            </div>
-            <div className='user-info-container'>
-                <button 
-                  className="create-post-btn"
-                  onClick={() => setIsModalOpen(true)}
-                >
-                  Howl
-                </button>
-                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className='profile-pic' />
+
+            <nav className="sidebar-nav">
+              <button
+                className={`sidebar-nav-item${activeSection === 'feed' ? ' sidebar-nav-active' : ''}`}
+                onClick={() => setActiveSection('feed')}
+              >
+                🏠 Home
+              </button>
+              <button
+                className={`sidebar-nav-item${activeSection === 'messages' ? ' sidebar-nav-active' : ''}`}
+                onClick={() => setActiveSection('messages')}
+              >
+                💬 Messages
+              </button>
+              <Link href="/my-profile" className="sidebar-nav-item">
+                👤 Profile
+              </Link>
+            </nav>
+
+            <div className="sidebar-bottom">
+              <button className="create-post-btn sidebar-howl-btn" onClick={() => setIsModalOpen(true)}>
+                Howl
+              </button>
+              <div className="sidebar-user-row">
+                <img src={getAvatarUrl(backendUser.avatar_url)} alt="Profile" className="profile-pic" />
                 <UserDropdown username={backendUser.full_name} />
+              </div>
             </div>
-          </nav>
-          <div className='post-section'>
-            <PostFeed />
+          </aside>
+
+          {/* Center Feed */}
+          <div className="center-content">
+            <div className="feed-search-top">
+              <input
+                type="text"
+                placeholder="Search for posts or users..."
+                className="search-bar"
+                onKeyDown={handleSearch}
+              />
+            </div>
+            <div className="post-section">
+              <PostFeed />
+            </div>
           </div>
+
+          {/* Right Panel — DMs */}
+          {activeSection === 'messages' && (
+            <aside className="right-panel">
+              <MessagesPanel currentUserId={backendUser.id} />
+            </aside>
+          )}
         </div>
       ) : (
-        // Logged out view
-        <div className='signed-out'>
-          <h1 className='site-title'>Howler</h1>
+        <div className="signed-out">
+          <h1 className="site-title">Howler</h1>
           <div className="divider" />
-          <div className='welcome'>
-            <p className='instructions'>Please log in with your UW account.</p>
+          <div className="welcome">
+            <p className="instructions">Please log in with your UW account.</p>
             <LoginButton />
           </div>
         </div>
       )}
+
       <PostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <CreatePostForm 
-          onPostCreated={() => {
-              setIsModalOpen(false);
-              window.location.reload(); // Only reload on success
-          }}
-          onCancel={() => {
-              setIsModalOpen(false); // Just close the modal, no refresh
-          }}
+        <CreatePostForm
+          onPostCreated={() => { setIsModalOpen(false); window.location.reload(); }}
+          onCancel={() => setIsModalOpen(false)}
         />
       </PostModal>
     </main>
