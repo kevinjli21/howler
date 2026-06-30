@@ -4,6 +4,7 @@ import LoginButton from './components/LoginButton';
 import PostModal from './components/PostModal';
 import CreatePostForm from './components/CreatePostForm';
 import PostFeed from './components/PostFeed';
+import MessagesPanel from './components/MessagesPanel';
 import Link from 'next/link';
 import { getAvatarUrl } from '@/utils/helpers';
 import { useAuth } from './components/AuthContext';
@@ -12,6 +13,7 @@ export default function Home() {
   const { user, loading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [feedKey, setFeedKey] = useState(0);
+  const [showDMs, setShowDMs] = useState(false);
 
   if (loading) {
     return <div className='signed-in' style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -52,6 +54,13 @@ export default function Home() {
                 <Link href="/" className='nav-item nav-item-active'>
                   <span>🏠</span><span>Home</span>
                 </Link>
+                <button
+                  className={`nav-item${showDMs ? ' nav-item-active' : ''}`}
+                  onClick={() => setShowDMs(v => !v)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                >
+                  <span>💬</span><span>Messages</span>
+                </button>
                 <Link href="/my-profile" className='nav-item'>
                   <span>👤</span><span>Profile</span>
                 </Link>
@@ -80,6 +89,12 @@ export default function Home() {
             </div>
             <PostFeed key={feedKey} />
           </div>
+
+          {showDMs && (
+            <div className='dm-column'>
+              <MessagesPanel currentUserId={user.id} />
+            </div>
+          )}
         </div>
       ) : (
         <div className='signed-out'>
