@@ -12,7 +12,6 @@ import { useAuth } from './components/AuthContext';
 export default function Home() {
   const { user, loading } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('feed');
   const [feedKey, setFeedKey] = useState(0);
 
   if (loading) {
@@ -40,18 +39,9 @@ export default function Home() {
             </Link>
 
             <nav className="sidebar-nav">
-              <button
-                className={`sidebar-nav-item${activeSection === 'feed' ? ' sidebar-nav-active' : ''}`}
-                onClick={() => setActiveSection('feed')}
-              >
+              <Link href="/" className="sidebar-nav-item sidebar-nav-active">
                 🏠 Home
-              </button>
-              <button
-                className={`sidebar-nav-item${activeSection === 'messages' ? ' sidebar-nav-active' : ''}`}
-                onClick={() => setActiveSection('messages')}
-              >
-                💬 Messages
-              </button>
+              </Link>
               <Link href="/my-profile" className="sidebar-nav-item">
                 👤 Profile
               </Link>
@@ -85,12 +75,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right Panel — DMs */}
-          {activeSection === 'messages' && (
-            <aside className="right-panel">
-              <MessagesPanel currentUserId={user.id} />
-            </aside>
-          )}
+          {/* Right Panel — DMs (always visible) */}
+          <aside className="right-panel">
+            <MessagesPanel currentUserId={user.id} />
+          </aside>
         </div>
       ) : (
         <div className='signed-out'>

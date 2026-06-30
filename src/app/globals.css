@@ -1519,6 +1519,7 @@ body {
 .center-content {
   flex: 1;
   min-width: 0;
+  max-width: 800px;
   overflow-y: auto;
   height: 100vh;
   background: var(--background);
@@ -1532,6 +1533,12 @@ body {
   position: sticky;
   top: 0;
   z-index: 10;
+  box-sizing: border-box;
+}
+
+.feed-search-top .search-bar {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .right-panel {
