@@ -1,13 +1,13 @@
 
 
 :root {
-  --background: #634993;
+  --background: #4b2e83;
   --foreground: #ededed;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #634993;
+    --background: #4b2e83;
     --foreground: #ededed;
   }
 }
@@ -156,17 +156,15 @@ main {
   position: sticky;
   top: 0;
   z-index: 100;
-  background-color: rgba(99, 73, 147, 0.88);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: white;
   padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .feed-heading {
   font-size: 1.2rem;
   font-weight: 700;
-  color: white;
+  color: #0f172a;
   margin: 0;
 }
 
@@ -640,12 +638,9 @@ main {
   gap: 8px;
   padding: 1rem;
   margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.7); 
-  backdrop-filter: blur(10px); 
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
-  border-radius: 10px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0;
 }
 
 .filter-menu button {
@@ -1443,16 +1438,20 @@ main {
   height: 100vh;
   overflow: hidden;
   width: 100%;
+  background: #4b2e83;
+  gap: 16px;
+  padding: 12px 16px;
+  box-sizing: border-box;
 }
 
 .left-sidebar {
-  width: 240px;
+  width: 220px;
   flex-shrink: 0;
   background: #4b2e83;
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
   gap: 0.25rem;
 }
@@ -1524,20 +1523,22 @@ main {
 .center-content {
   flex: 1;
   min-width: 0;
+  max-width: 620px;
   overflow-y: auto;
-  height: 100vh;
-  background: var(--background);
+  height: 100%;
+  background: white;
+  border-radius: 12px;
 }
 
 .feed-search-top {
   padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
   z-index: 10;
   box-sizing: border-box;
+  border-radius: 12px 12px 0 0;
 }
 
 .feed-search-top .search-bar {
@@ -1546,11 +1547,11 @@ main {
 }
 
 .right-panel {
-  width: 380px;
+  width: 320px;
   flex-shrink: 0;
-  height: 100vh;
-  border-left: 1px solid #e2e8f0;
+  height: 100%;
   background: white;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
