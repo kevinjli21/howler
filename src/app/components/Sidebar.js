@@ -41,6 +41,9 @@ export default function Sidebar({ user, activeNav = '' }) {
             <Link href="/" className={`nav-item${activeNav === 'home' ? ' nav-item-active' : ''}`}>
               <span>🏠</span><span>Home</span>
             </Link>
+            <Link href="/messages" className={`nav-item${activeNav === 'messages' ? ' nav-item-active' : ''}`}>
+              <span>💬</span><span>Messages</span>
+            </Link>
             <Link href="/my-profile" className={`nav-item${activeNav === 'profile' ? ' nav-item-active' : ''}`}>
               <span>👤</span><span>Profile</span>
             </Link>
