@@ -1,5 +1,5 @@
 'use client';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import CommentsModal from '../../components/CommentsModal';
@@ -9,6 +9,7 @@ import ReportModal from '../../components/ReportModal';
 
 export default function OtherProfilePage() {
   const { username } = useParams();
+  const router = useRouter();
   const [userProfile, setUserProfile] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,6 +17,7 @@ export default function OtherProfilePage() {
   const [navbarUser, setNavbarUser] = useState(null);
   const [activeCommentPost, setActiveCommentPost] = useState(null);
   const [reportingPost, setReportingPost] = useState(null);
+  const [dmLoading, setDmLoading] = useState(false);
 
   useEffect(() => {
     const fetchCurrentSession = async () => {
@@ -59,6 +61,31 @@ export default function OtherProfilePage() {
     fetchCurrentSession();
     if (username) fetchPublicProfile();
   }, [username]);
+
+  const handleMessageUser = async () => {
+    setDmLoading(true);
+    try {
+      const res = await fetch('/api/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ other_user_id: userProfile.id }),
+      });
+      if (res.ok) {
+        const { conversation_id } = await res.json();
+        const params = new URLSearchParams({
+          convo: conversation_id,
+          name: userProfile.full_name || '',
+          username: userProfile.username || '',
+          avatar: userProfile.avatar_url || '',
+        });
+        router.push(`/messages?${params}`);
+      }
+    } catch (err) {
+      console.error('Failed to open DM:', err);
+    } finally {
+      setDmLoading(false);
+    }
+  };
 
   const handleOtherProfileLike = async (post) => {
     const isCurrentlyLiked = Array.isArray(post.user_has_liked) && post.user_has_liked.length > 0;
@@ -130,6 +157,15 @@ export default function OtherProfilePage() {
               <p className="campus-label">
                 📍 {userProfile.campus?.name || "No campus selected"}
               </p>
+              {currentUserId && currentUserId !== userProfile.id && (
+                <button
+                  className="message-user-btn"
+                  onClick={handleMessageUser}
+                  disabled={dmLoading}
+                >
+                  {dmLoading ? 'Opening...' : '💬 Message'}
+                </button>
+              )}
             </div>
           </div>
 

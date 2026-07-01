@@ -3,9 +3,9 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { getAvatarUrl } from '@/utils/helpers';
 
-export default function MessagesPanel({ currentUserId }) {
+export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   const [conversations, setConversations] = useState([]);
-  const [selectedConvo, setSelectedConvo] = useState(null);
+  const [selectedConvo, setSelectedConvo] = useState(initialConvo);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);

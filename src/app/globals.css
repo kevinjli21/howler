@@ -1882,3 +1882,25 @@ body {
   background-color: #cbd5e1;
   cursor: not-allowed;
 }
+
+.message-user-btn {
+  margin-top: 10px;
+  padding: 8px 20px;
+  background-color: #4b2e83;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.message-user-btn:hover {
+  opacity: 0.85;
+}
+
+.message-user-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
