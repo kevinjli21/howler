@@ -18,6 +18,11 @@ export const metadata = {
   description: "A social app for UW students",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
+
 export default function RootLayout({ children }) {
   return (
     <html
