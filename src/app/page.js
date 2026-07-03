@@ -79,7 +79,18 @@ export default function Home() {
 
           <div className='main-feed-area'>
             <div className='feed-sticky-header'>
-              <h2 className='feed-heading'>Home</h2>
+              <div className='feed-header-top'>
+                <Link href="/" className='mobile-logo-link'>
+                  <img className='mobile-header-logo' src="/icon.png" alt="Howler" />
+                </Link>
+                <h2 className='feed-heading'>Home</h2>
+              </div>
+              <input
+                type="text"
+                placeholder="Search..."
+                className='mobile-header-search'
+                onKeyDown={handleSearch}
+              />
             </div>
             <PostFeed key={feedKey} />
           </div>

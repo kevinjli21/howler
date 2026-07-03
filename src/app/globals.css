@@ -160,11 +160,33 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
+.feed-header-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .feed-heading {
   font-size: 1.2rem;
   font-weight: 700;
   color: white;
   margin: 0;
+}
+
+.mobile-logo-link {
+  display: none;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.mobile-header-logo {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+}
+
+.mobile-header-search {
+  display: none;
 }
 
 /* ── Signed-out page ─────────────────────────────── */
@@ -2020,7 +2042,34 @@ body {
   }
 
   .feed-sticky-header {
-    padding: 12px 16px;
+    padding: 10px 14px;
+  }
+
+  .mobile-logo-link {
+    display: flex;
+  }
+
+  .mobile-header-search {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 14px;
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    font-size: 14px;
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+  }
+
+  .mobile-header-search::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .mobile-header-search:focus {
+    background-color: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 
   /* ── Post image: respect container width ── */
