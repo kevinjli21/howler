@@ -15,6 +15,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const messagesEndRef = useRef(null);
+  const messageInputRef = useRef(null);
   const supabaseRef = useRef(createClient());
   const supabase = supabaseRef.current;
 
@@ -127,7 +128,10 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
     } catch (err) {
       console.error('Failed to send message:', err);
       setMessages(prev => prev.filter(m => m.id !== optimistic.id));
-    } finally { setSending(false); }
+    } finally {
+      setSending(false);
+      messageInputRef.current?.focus();
+    }
   };
 
   const handleInputKeyDown = (e) => {
@@ -185,6 +189,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
 
         <form onSubmit={sendMessage} className="dm-input-form">
           <input
+            ref={messageInputRef}
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
