@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/client';
 import PostModal from './PostModal';
 import CreatePostForm from './CreatePostForm';
 
-export default function Sidebar({ user, activeNav = '' }) {
+export default function Sidebar({ user, activeNav = '', onPostCreated }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const supabase = createClient();
 
@@ -88,7 +88,11 @@ export default function Sidebar({ user, activeNav = '' }) {
         <CreatePostForm
           onPostCreated={() => {
             setIsModalOpen(false);
-            window.location.reload();
+            if (onPostCreated) {
+              onPostCreated();
+            } else {
+              window.location.reload();
+            }
           }}
           onCancel={() => setIsModalOpen(false)}
         />
