@@ -1,6 +1,6 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, ViewTransition } from 'react';
 import Link from 'next/link';
 import Sidebar from '../components/Sidebar';
 import CommentsModal from '../components/CommentsModal';
@@ -62,6 +62,7 @@ function SearchContent() {
         <div className='signed-in'>
             <Sidebar user={backendUser} activeNav='home' />
 
+            <ViewTransition enter="page-in" exit="page-out" default="none">
             <div className='main-feed-area'>
                 <div className='feed-sticky-header'>
                     <h2 className='feed-heading'>
@@ -173,6 +174,7 @@ function SearchContent() {
                     </section>
                 </div>
             </div>
+            </ViewTransition>
 
             {activeCommentPost && (
                 <CommentsModal post={results.posts.find(p => p.id === activeCommentPost.id) || activeCommentPost} currentUserId={backendUser?.id} onClose={() => setActiveCommentPost(null)} onLike={handleSearchPostLike} onDeletePost={null} />

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ViewTransition } from 'react';
 import Link from 'next/link';
 import Sidebar from '../components/Sidebar';
 import CommentsModal from '../components/CommentsModal';
@@ -185,6 +185,7 @@ export default function MyProfile() {
         <div className='signed-in'>
             <Sidebar user={backendUser} activeNav='profile' />
 
+            <ViewTransition enter="page-in" exit="page-out" default="none">
             <div className='main-feed-area'>
                 <div className='feed-sticky-header'>
                     <h2 className='feed-heading'>Profile</h2>
@@ -427,6 +428,7 @@ export default function MyProfile() {
                     )}
                 </div>
             </div>
+            </ViewTransition>
         </div>
     );
 }

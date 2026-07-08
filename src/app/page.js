@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, ViewTransition } from 'react';
 import LoginButton from './components/LoginButton';
 import PostFeed from './components/PostFeed';
 import Sidebar from './components/Sidebar';
@@ -29,23 +29,25 @@ export default function Home() {
         <div className='signed-in'>
           <Sidebar user={user} activeNav='home' onPostCreated={() => setFeedKey(k => k + 1)} />
 
-          <div className='main-feed-area'>
-            <div className='feed-sticky-header'>
-              <div className='feed-header-top'>
-                <Link href="/" className='mobile-logo-link'>
-                  <img className='mobile-header-logo' src="/icon.png" alt="Howler" />
-                </Link>
-                <h2 className='feed-heading'>Home</h2>
+          <ViewTransition enter="page-in" exit="page-out" default="none">
+            <div className='main-feed-area'>
+              <div className='feed-sticky-header'>
+                <div className='feed-header-top'>
+                  <Link href="/" className='mobile-logo-link'>
+                    <img className='mobile-header-logo' src="/icon.png" alt="Howler" />
+                  </Link>
+                  <h2 className='feed-heading'>Home</h2>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className='mobile-header-search'
+                  onKeyDown={handleSearch}
+                />
               </div>
-              <input
-                type="text"
-                placeholder="Search..."
-                className='mobile-header-search'
-                onKeyDown={handleSearch}
-              />
+              <PostFeed key={feedKey} />
             </div>
-            <PostFeed key={feedKey} />
-          </div>
+          </ViewTransition>
 
         </div>
       ) : (

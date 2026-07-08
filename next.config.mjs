@@ -3,6 +3,9 @@ const nextConfig = {
   /* config options here */
   serverExternalPackages: ["@google-cloud/vision"],
   reactCompiler: true,
+  experimental: {
+    viewTransition: true,
+  },
 };
 
 export default nextConfig;

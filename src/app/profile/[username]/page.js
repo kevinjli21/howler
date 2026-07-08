@@ -1,6 +1,6 @@
 'use client';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ViewTransition } from 'react';
 import Link from 'next/link';
 import CommentsModal from '../../components/CommentsModal';
 import Sidebar from '../../components/Sidebar';
@@ -135,6 +135,7 @@ export default function OtherProfilePage() {
     <div className='signed-in'>
       <Sidebar user={navbarUser} activeNav='home' />
 
+      <ViewTransition enter="page-in" exit="page-out" default="none">
       <div className='main-feed-area'>
         <div className='feed-sticky-header'>
           <h2 className='feed-heading'>Profile</h2>
@@ -288,6 +289,7 @@ export default function OtherProfilePage() {
           </section>
         </div>
       </div>
+      </ViewTransition>
 
       {activeCommentPost && (
         <CommentsModal

@@ -30,6 +30,49 @@ body {
   margin: 0 auto;
 }
 
+/* ── Page transitions ─────────────────────────────── */
+/* The sidebar is remounted on every route (each page renders its own
+   <Sidebar>), so it's given a stable view-transition name and told not
+   to animate — otherwise it would flash/crossfade with itself on nav. */
+::view-transition-group(sidebar) {
+  animation: none;
+}
+::view-transition-old(sidebar) {
+  display: none;
+}
+::view-transition-new(sidebar) {
+  animation: none;
+}
+
+::view-transition-old(.page-out) {
+  animation: 120ms ease-in both howler-page-out;
+}
+::view-transition-new(.page-in) {
+  animation: 220ms ease-out 90ms both howler-page-in;
+}
+
+@keyframes howler-page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+@keyframes howler-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
 /* ── Sidebar ──────────────────────────────────────── */
 .sidebar {
   width: 350px;

@@ -26,7 +26,7 @@ export default function Sidebar({ user, activeNav = '', onPostCreated }) {
 
   return (
     <>
-      <aside className='sidebar'>
+      <aside className='sidebar' style={{ viewTransitionName: 'sidebar' }}>
         <div className='sidebar-top'>
           <Link href="/" className='logo-link-wrapper'>
             <div className='sidebar-logo'>
@@ -55,7 +55,7 @@ export default function Sidebar({ user, activeNav = '', onPostCreated }) {
               <span>👤</span><span>Profile</span>
             </Link>
             <button className='nav-item nav-item-button' onClick={handleLogout}>
-              <span>🚪</span><span>Log out</span>
+              <span>🚪</span><span>Log Out</span>
             </button>
           </nav>
 

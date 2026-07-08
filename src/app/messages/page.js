@@ -1,5 +1,5 @@
 'use client';
-import { Suspense } from 'react';
+import { Suspense, ViewTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Sidebar from '../components/Sidebar';
 import MessagesPanel from '../components/MessagesPanel';
@@ -39,11 +39,13 @@ export default function MessagesPage() {
     <main>
       <div className='signed-in'>
         <Sidebar user={user} activeNav='messages' />
-        <div className='main-feed-area'>
-          <Suspense fallback={null}>
-            <MessagesPanelWithParams currentUserId={user.id} />
-          </Suspense>
-        </div>
+        <ViewTransition enter="page-in" exit="page-out" default="none">
+          <div className='main-feed-area'>
+            <Suspense fallback={null}>
+              <MessagesPanelWithParams currentUserId={user.id} />
+            </Suspense>
+          </div>
+        </ViewTransition>
       </div>
     </main>
   );
