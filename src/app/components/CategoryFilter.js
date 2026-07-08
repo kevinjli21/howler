@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { ensureContrast } from '@/utils/color';
 
 export default function CategoryFilter({ onSelect }) {
   const [categories, setCategories] = useState([]);
@@ -44,22 +45,30 @@ export default function CategoryFilter({ onSelect }) {
         All
       </button>
 
-      {categories.map(cat => (
-        <button 
-          key={cat.id} 
-          className={activeCategory === cat.id ? 'active' : ''}
-          onClick={() => handleClick(cat.id)}
-          style={{ 
-            borderColor: cat.color,
-            color: activeCategory === cat.id ? '#fff' : cat.color,
-            backgroundColor: activeCategory === cat.id ? cat.color : 'transparent',
-            // Subtle transition for that "frosted glass" feel
-            transition: 'all 0.2s ease'
-          }}
-        >
-          {cat.category_name}
-        </button>
-      ))}
+      {categories.map(cat => {
+        // Categories store arbitrary colors (e.g. yellow) that can fail WCAG
+        // AA contrast (4.5:1) as text-on-white or as a background behind
+        // white text. Darken/lighten toward that threshold while keeping
+        // the hue, so every category stays legible.
+        const safeColor = ensureContrast(cat.color, '#ffffff', 4.5);
+
+        return (
+          <button
+            key={cat.id}
+            className={activeCategory === cat.id ? 'active' : ''}
+            onClick={() => handleClick(cat.id)}
+            style={{
+              borderColor: safeColor,
+              color: activeCategory === cat.id ? '#fff' : safeColor,
+              backgroundColor: activeCategory === cat.id ? safeColor : 'transparent',
+              // Subtle transition for that "frosted glass" feel
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {cat.category_name}
+          </button>
+        );
+      })}
     </div>
   );
 }

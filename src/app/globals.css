@@ -708,7 +708,10 @@ body {
   background: white;
   white-space: nowrap;
   cursor: pointer;
-  font-weight: 600;
+  font-family: var(--font-legible), Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  letter-spacing: 0.1px;
   transition: all 0.2s ease;
 }
 
