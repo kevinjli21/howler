@@ -2,11 +2,18 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { getAvatarUrl } from '@/utils/helpers';
+import { createClient } from '@/utils/supabase/client';
 import PostModal from './PostModal';
 import CreatePostForm from './CreatePostForm';
 
 export default function Sidebar({ user, activeNav = '' }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.assign('/');
+  };
 
   const handleSearch = (e) => {
     if (e.key === 'Enter') {
@@ -54,16 +61,27 @@ export default function Sidebar({ user, activeNav = '' }) {
           </button>
         </div>
 
-        <Link href="/my-profile" className='sidebar-user-section'>
-          <img
-            src={getAvatarUrl(user?.avatar_url)}
-            alt="Profile"
-            className='sidebar-avatar'
-          />
-          <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
-            {user?.full_name || 'User'}
-          </span>
-        </Link>
+        <div className='sidebar-bottom'>
+          <Link href="/my-profile" className='sidebar-user-section'>
+            <img
+              src={getAvatarUrl(user?.avatar_url)}
+              alt="Profile"
+              className='sidebar-avatar'
+            />
+            <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
+              {user?.full_name || 'User'}
+            </span>
+          </Link>
+
+          <button
+            className='sidebar-logout-btn'
+            onClick={handleLogout}
+            title="Log out"
+            aria-label="Log out"
+          >
+            🚪
+          </button>
+        </div>
       </aside>
 
       <PostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
