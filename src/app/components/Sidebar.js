@@ -54,7 +54,7 @@ export default function Sidebar({ user, activeNav = '' }) {
           </button>
         </div>
 
-        <div className='sidebar-user-section'>
+        <Link href="/my-profile" className='sidebar-user-section'>
           <img
             src={getAvatarUrl(user?.avatar_url)}
             alt="Profile"
@@ -63,7 +63,7 @@ export default function Sidebar({ user, activeNav = '' }) {
           <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
             {user?.full_name || 'User'}
           </span>
-        </div>
+        </Link>
       </aside>
 
       <PostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
