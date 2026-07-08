@@ -54,6 +54,9 @@ export default function Sidebar({ user, activeNav = '', onPostCreated }) {
             <Link href="/my-profile" className={`nav-item${activeNav === 'profile' ? ' nav-item-active' : ''}`}>
               <span>👤</span><span>Profile</span>
             </Link>
+            <button className='nav-item nav-item-button' onClick={handleLogout}>
+              <span>🚪</span><span>Log out</span>
+            </button>
           </nav>
 
           <button className="howl-btn" onClick={() => setIsModalOpen(true)}>
@@ -61,27 +64,16 @@ export default function Sidebar({ user, activeNav = '', onPostCreated }) {
           </button>
         </div>
 
-        <div className='sidebar-bottom'>
-          <Link href="/my-profile" className='sidebar-user-section'>
-            <img
-              src={getAvatarUrl(user?.avatar_url)}
-              alt="Profile"
-              className='sidebar-avatar'
-            />
-            <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
-              {user?.full_name || 'User'}
-            </span>
-          </Link>
-
-          <button
-            className='sidebar-logout-btn'
-            onClick={handleLogout}
-            title="Log out"
-            aria-label="Log out"
-          >
-            🚪
-          </button>
-        </div>
+        <Link href="/my-profile" className='sidebar-user-section'>
+          <img
+            src={getAvatarUrl(user?.avatar_url)}
+            alt="Profile"
+            className='sidebar-avatar'
+          />
+          <span className='truncate-text' style={{ color: 'white', fontWeight: 500, fontSize: '0.9rem' }}>
+            {user?.full_name || 'User'}
+          </span>
+        </Link>
       </aside>
 
       <PostModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>

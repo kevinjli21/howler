@@ -103,6 +103,14 @@ body {
   font-weight: 700;
 }
 
+.nav-item-button {
+  width: 100%;
+  border: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
+}
+
 .howl-btn {
   width: 97%;
   padding: 13px;
@@ -121,12 +129,6 @@ body {
   opacity: 0.88;
 }
 
-.sidebar-bottom {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
 .sidebar-user-section {
   display: flex;
   align-items: center;
@@ -135,31 +137,9 @@ body {
   border-radius: 30px;
   text-decoration: none;
   cursor: pointer;
-  flex: 1;
-  min-width: 0;
 }
 
 .sidebar-user-section:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-}
-
-.sidebar-logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: white;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.sidebar-logout-btn:hover {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
@@ -2027,7 +2007,7 @@ body {
 
   .sidebar-logo,
   .sidebar-search,
-  .sidebar-bottom {
+  .sidebar-user-section {
     display: none;
   }
 
