@@ -1,37 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
-import { Ratelimit } from '@upstash/ratelimit'
-import { Redis } from '@upstash/redis'
+import { apiLimiter, writeLimiter, getClientIdentifier, rateLimitedResponse } from '@/utils/rateLimit'
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(60, "1 m"), // 60 requests per minute max
-  analytics: true,
-});
+const MUTATING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE']
 
 export async function proxy(request) {
-  // const currentPath = request.nextUrl.pathname;
-
-
-  // if (currentPath.startsWith('/api/')) {
-  //   const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
-  //   const { success, limit, reset, remaining } = await ratelimit.limit(ip);
-
-  //   if (!success) {
-  //     return NextResponse.json(
-  //       { error: 'Too many requests howling in at once! Please slow down.' },
-  //       { 
-  //         status: 429, 
-  //         headers: {
-  //           'X-RateLimit-Limit': limit.toString(),
-  //           'X-RateLimit-Remaining': remaining.toString(),
-  //           'X-RateLimit-Reset': reset.toString(),
-  //         }
-  //       }
-  //     );
-  //   }
-  // }
-
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -61,7 +34,17 @@ export async function proxy(request) {
   )
 
   // Token refresh poke
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const identifier = getClientIdentifier(request, user?.id)
+    const limiter = MUTATING_METHODS.includes(request.method) ? writeLimiter : apiLimiter
+    const { success, limit, remaining, reset } = await limiter.limit(identifier)
+
+    if (!success) {
+      return rateLimitedResponse({ limit, remaining, reset })
+    }
+  }
 
   return response;
 }
