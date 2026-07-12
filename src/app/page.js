@@ -57,6 +57,11 @@ export default function Home() {
           <div className='welcome'>
             <p className='instructions'>Please log in with your UW account.</p>
             <LoginButton />
+            <nav className='site-footer-links'>
+              <Link href="/community-guidelines">Community Guidelines</Link>
+              <Link href="/privacy-policy">Privacy Policy</Link>
+              <Link href="/terms">Terms of Use</Link>
+            </nav>
           </div>
         </div>
       )}

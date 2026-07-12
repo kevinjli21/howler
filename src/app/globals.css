@@ -1987,6 +1987,147 @@ body {
   cursor: not-allowed;
 }
 
+/* ── Legal / policy pages ─────────────────────────── */
+.legal-page {
+  min-height: 100vh;
+  padding: 56px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.legal-card {
+  width: 100%;
+  max-width: 760px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 40px 48px 32px;
+  box-shadow: 0 20px 45px -12px rgba(0, 0, 0, 0.35);
+}
+
+.legal-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #634993;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.legal-back-link:hover {
+  text-decoration: underline;
+}
+
+.legal-title {
+  font-family: 'Tanker-Regular', sans-serif;
+  font-weight: 700;
+  font-size: 2.75rem;
+  letter-spacing: -0.5px;
+  color: #4b2e83;
+  margin: 0 0 0.35rem;
+}
+
+.legal-updated {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 0 0 2rem;
+}
+
+.legal-body h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f1419;
+  margin: 2rem 0 0.75rem;
+}
+
+.legal-body h2:first-child {
+  margin-top: 0;
+}
+
+.legal-body h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #4b2e83;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.legal-body p {
+  color: #334155;
+  font-size: 1rem;
+  line-height: 1.65;
+  margin: 0 0 1rem;
+}
+
+.legal-body ul {
+  margin: 0 0 1rem;
+  padding-left: 1.25rem;
+  color: #334155;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.legal-body li {
+  margin-bottom: 0.5rem;
+}
+
+.legal-body strong {
+  color: #0f1419;
+}
+
+.legal-footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.legal-footer-nav a {
+  color: #634993;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.legal-footer-nav a:hover {
+  text-decoration: underline;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.25rem;
+  margin-top: 28px;
+}
+
+.site-footer-links a {
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.site-footer-links a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .legal-page {
+    padding: 32px 12px 90px;
+  }
+
+  .legal-card {
+    padding: 28px 22px 24px;
+  }
+
+  .legal-title {
+    font-size: 2rem;
+  }
+}
+
 /* ======================================================
    MOBILE RESPONSIVE OVERRIDES
    ====================================================== */
