@@ -1617,6 +1617,82 @@ body {
   box-shadow: none !important;
 }
 
+/* ── Trending Column (third flex child on home) ───── */
+.trending-column {
+  width: 300px;
+  flex-shrink: 0;
+  padding: 20px 16px;
+  height: 100vh;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+}
+
+.trending-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.trending-heading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 14px;
+}
+
+.trending-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trending-rank {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-weight: 600;
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.trending-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.trending-badge {
+  display: inline-block;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.trending-count {
+  font-size: 0.78rem;
+  color: #64748b;
+}
+
+.trending-empty {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .trending-column {
+    display: none;
+  }
+}
+
 /* ── DM Column (third flex child in .signed-in) ───── */
 .dm-column {
   width: 380px;

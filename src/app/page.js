@@ -3,6 +3,7 @@ import { useState, ViewTransition } from 'react';
 import LoginButton from './components/LoginButton';
 import PostFeed from './components/PostFeed';
 import Sidebar from './components/Sidebar';
+import TrendingPanel from './components/TrendingPanel';
 import Link from 'next/link';
 import { useAuth } from './components/AuthContext';
 
@@ -49,6 +50,7 @@ export default function Home() {
             </div>
           </ViewTransition>
 
+          <TrendingPanel />
         </div>
       ) : (
         <div className='signed-out'>

@@ -37,12 +37,16 @@ export async function proxy(request) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    const identifier = getClientIdentifier(request, user?.id)
-    const limiter = MUTATING_METHODS.includes(request.method) ? writeLimiter : apiLimiter
-    const { success, limit, remaining, reset } = await limiter.limit(identifier)
+    try {
+      const identifier = getClientIdentifier(request, user?.id)
+      const limiter = MUTATING_METHODS.includes(request.method) ? writeLimiter : apiLimiter
+      const { success, limit, remaining, reset } = await limiter.limit(identifier)
 
-    if (!success) {
-      return rateLimitedResponse({ limit, remaining, reset })
+      if (!success) {
+        return rateLimitedResponse({ limit, remaining, reset })
+      }
+    } catch {
+      // Redis unavailable (missing env vars in local dev) — skip rate limiting
     }
   }
 
