@@ -38,6 +38,13 @@ export default function LoginButtons() {
       <button className="google-btn" onClick={handleMicrosoftLogin}>
         Sign in with Microsoft
       </button>
+
+      <p className="auth-legal-text">
+        By signing in, you agree to our{' '}
+        <a href="/terms" className="auth-legal-link">Terms of Use</a>
+        {' '}and{' '}
+        <a href="/privacy-policy" className="auth-legal-link">Privacy Policy</a>.
+      </p>
     </div>
   );
 }
