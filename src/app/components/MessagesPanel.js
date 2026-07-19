@@ -14,6 +14,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
+  const [readTimes, setReadTimes] = useState({});
   const messagesEndRef = useRef(null);
   const messageInputRef = useRef(null);
   const supabaseRef = useRef(createClient());
@@ -22,6 +23,33 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    const stored = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith('dm_last_read_')) {
+        stored[key.replace('dm_last_read_', '')] = localStorage.getItem(key);
+      }
+    }
+    setReadTimes(stored);
+  }, []);
+
+  const isUnread = (convo) => {
+    if (!convo.last_message) return false;
+    if (convo.last_message.sender_id === currentUserId) return false;
+    const lastRead = readTimes[convo.id];
+    if (!lastRead) return true;
+    return new Date(convo.last_message_at) > new Date(lastRead);
+  };
+
+  const selectConvo = (convo) => {
+    const now = new Date().toISOString();
+    localStorage.setItem(`dm_last_read_${convo.id}`, now);
+    setReadTimes(prev => ({ ...prev, [convo.id]: now }));
+    window.dispatchEvent(new CustomEvent('dm-read-update'));
+    setSelectedConvo(convo);
+  };
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -258,7 +286,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
           </div>
         )}
         {conversations.map(convo => (
-          <button key={convo.id} className="dm-convo-item" onClick={() => setSelectedConvo(convo)}>
+          <button key={convo.id} className={`dm-convo-item${isUnread(convo) ? ' dm-convo-unread' : ''}`} onClick={() => selectConvo(convo)}>
             <img
               src={getAvatarUrl(convo.other_user?.avatar_url)}
               alt="avatar"
@@ -267,10 +295,21 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
             <div className="dm-convo-info">
               <span className="dm-convo-name">{convo.other_user?.full_name}</span>
               <span className="dm-convo-handle">@{convo.other_user?.username}</span>
+              {convo.last_message && (
+                <span className="dm-convo-preview">
+                  {convo.last_message.sender_id === currentUserId ? 'You: ' : ''}
+                  {convo.last_message.content.length > 45
+                    ? convo.last_message.content.slice(0, 45) + '…'
+                    : convo.last_message.content}
+                </span>
+              )}
             </div>
-            {convo.last_message_at && (
-              <span className="dm-convo-time">{formatDate(convo.last_message_at)}</span>
-            )}
+            <div className="dm-convo-right">
+              {convo.last_message_at && (
+                <span className="dm-convo-time">{formatDate(convo.last_message_at)}</span>
+              )}
+              {isUnread(convo) && <span className="dm-unread-dot" />}
+            </div>
           </button>
         ))}
       </div>

@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getAvatarUrl } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/client';
 import PostModal from './PostModal';
@@ -8,7 +8,31 @@ import CreatePostForm from './CreatePostForm';
 
 export default function Sidebar({ user, activeNav = '', onPostCreated }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const supabase = createClient();
+
+  const computeUnread = useCallback(async () => {
+    if (!user?.id) return;
+    try {
+      const res = await fetch('/api/conversations');
+      if (!res.ok) return;
+      const convos = await res.json();
+      let count = 0;
+      convos.forEach(convo => {
+        if (!convo.last_message) return;
+        if (convo.last_message.sender_id === user.id) return;
+        const lastRead = localStorage.getItem(`dm_last_read_${convo.id}`);
+        if (!lastRead || new Date(convo.last_message_at) > new Date(lastRead)) count++;
+      });
+      setUnreadCount(count);
+    } catch {}
+  }, [user?.id]);
+
+  useEffect(() => {
+    computeUnread();
+    window.addEventListener('dm-read-update', computeUnread);
+    return () => window.removeEventListener('dm-read-update', computeUnread);
+  }, [computeUnread]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -50,6 +74,9 @@ export default function Sidebar({ user, activeNav = '', onPostCreated }) {
             </Link>
             <Link href="/messages" className={`nav-item${activeNav === 'messages' ? ' nav-item-active' : ''}`}>
               <span>💬</span><span>Messages</span>
+              {unreadCount > 0 && (
+                <span className="nav-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
+              )}
             </Link>
             <Link href="/my-profile" className={`nav-item${activeNav === 'profile' ? ' nav-item-active' : ''}`}>
               <span>👤</span><span>Profile</span>

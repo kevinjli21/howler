@@ -18,7 +18,7 @@ export async function GET() {
 
   const convoIds = participations.map(p => p.conversation_id);
 
-  const [othersRes, convosRes] = await Promise.all([
+  const [othersRes, convosRes, lastMsgsRes] = await Promise.all([
     supabase
       .from('conversation_participants')
       .select('conversation_id, profiles(id, full_name, username, avatar_url)')
@@ -29,15 +29,31 @@ export async function GET() {
       .select('id, last_message_at')
       .in('id', convoIds)
       .order('last_message_at', { ascending: false }),
+    supabase
+      .from('direct_messages')
+      .select('conversation_id, content, sender_id')
+      .in('conversation_id', convoIds)
+      .order('created_at', { ascending: false })
+      .limit(Math.max(convoIds.length * 3, 30)),
   ]);
 
   if (othersRes.error || convosRes.error) {
     return NextResponse.json({ error: 'Failed to load conversation data' }, { status: 500 });
   }
 
+  const lastMsgMap = {};
+  (lastMsgsRes.data || []).forEach(msg => {
+    if (!lastMsgMap[msg.conversation_id]) lastMsgMap[msg.conversation_id] = msg;
+  });
+
   const result = (convosRes.data || []).map(convo => {
     const other = othersRes.data?.find(o => o.conversation_id === convo.id);
-    return { id: convo.id, last_message_at: convo.last_message_at, other_user: other?.profiles || null };
+    return {
+      id: convo.id,
+      last_message_at: convo.last_message_at,
+      other_user: other?.profiles || null,
+      last_message: lastMsgMap[convo.id] || null,
+    };
   }).filter(c => c.other_user !== null);
 
   return NextResponse.json(result);
