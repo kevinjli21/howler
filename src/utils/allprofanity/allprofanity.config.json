@@ -4,7 +4,7 @@
     "matching": "hybrid",
     "useAhoCorasick": true,
     "useBloomFilter": true,
-    "useContextAnalysis": true
+    "useContextAnalysis": false
   },
   "bloomFilter": {
     "enabled": true,
@@ -16,7 +16,7 @@
     "prebuild": true
   },
   "contextAnalysis": {
-    "enabled": true,
+    "enabled": false,
     "contextWindow": 50,
     "languages": ["en"],
     "scoreThreshold": 0.7

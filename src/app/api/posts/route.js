@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { AllProfanity } from 'allprofanity';
 import config from '@/utils/allprofanity/allprofanity.config.json';
 import { ImageAnnotatorClient } from '@google-cloud/vision';
+import { dbErrorResponse, isValidUUID } from '@/utils/apiError';
 
 // 1. Initialize Vision Client once outside the handlers
 const visionClient = new ImageAnnotatorClient({
@@ -32,16 +33,22 @@ export async function GET(request) {
     let query = supabase
       .from('posts')
       .select(`
-        *, 
+        *,
         profiles (full_name, avatar_url, username),
         categories (category_name, color),
         comments(count),
-        likes:likes(count), 
+        likes:likes(count),
         user_has_liked:likes(user_id)
       `)
-      .eq('user_has_liked.user_id', userId) 
       .order('posted_at', { ascending: false })
       .range(from, to);
+
+    // Only filter the embedded user_has_liked resource when there's an
+    // actual user — passing a JS null into .eq() produces "eq.null", which
+    // Postgres rejects (it must be .is.null), causing a 500 for anonymous callers.
+    query = userId
+      ? query.eq('user_has_liked.user_id', userId)
+      : query.is('user_has_liked.user_id', null);
 
     if (categoryId) {
       query = query.eq('category_id', categoryId);
@@ -52,7 +59,7 @@ export async function GET(request) {
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorResponse(error);
   }
 }
 
@@ -78,9 +85,13 @@ export async function POST(req) {
     }
 
     if (content.length > MAX_CHAR_LIMIT) {
-      return NextResponse.json({ 
-        error: `Post is too long! Please keep it under ${MAX_CHAR_LIMIT} characters (Current: ${content.length}).` 
+      return NextResponse.json({
+        error: `Post is too long! Please keep it under ${MAX_CHAR_LIMIT} characters (Current: ${content.length}).`
       }, { status: 400 });
+    }
+
+    if (!isValidUUID(categoryId)) {
+      return NextResponse.json({ error: 'Please select a category.' }, { status: 400 });
     }
 
     // Text Profanity Validation
@@ -118,10 +129,14 @@ export async function POST(req) {
 
       const [result] = await visionClient.safeSearchDetection(buffer);
       const detections = result.safeSearchAnnotation;
-      
+
       console.log(`[Google Vision Executed] Checking image for user ${user.id}`);
-      
-      const isUnsafe = 
+
+      if (!detections) {
+        return NextResponse.json({ error: 'Could not process this image. Please try a different file.' }, { status: 400 });
+      }
+
+      const isUnsafe =
         detections.adult === 'LIKELY' || detections.adult === 'VERY_LIKELY' ||
         detections.violence === 'LIKELY' || detections.violence === 'VERY_LIKELY' || 
         detections.adult === 'POSSIBLE';
@@ -142,21 +157,42 @@ export async function POST(req) {
       imageUrl = urlData.publicUrl;
     }
 
+    // Idempotency guard: a scripted/double-fired client can send two
+    // identical requests within milliseconds of each other. If the same
+    // user just created an identical post in the last few seconds, treat
+    // this as a duplicate submission instead of inserting a second copy.
+    const DEDUPE_WINDOW_AGO = new Date(Date.now() - 5000).toISOString();
+    const { data: recentDupe, error: dupeError } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('content', content)
+      .eq('category_id', categoryId)
+      .gte('posted_at', DEDUPE_WINDOW_AGO)
+      .order('posted_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (dupeError) throw dupeError;
+
+    if (recentDupe) {
+      return NextResponse.json({ success: true, data: [recentDupe] });
+    }
+
     // Database Insert for the actual post
     const { data, error: dbError } = await supabase
       .from('posts')
-      .insert([{ 
-        content, 
-        category_id: categoryId, 
-        image_url: imageUrl, 
-        user_id: user.id 
+      .insert([{
+        content,
+        category_id: categoryId,
+        image_url: imageUrl,
+        user_id: user.id
       }]);
 
     if (dbError) throw dbError;
 
     return NextResponse.json({ success: true, data });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return dbErrorResponse(err);
   }
 }

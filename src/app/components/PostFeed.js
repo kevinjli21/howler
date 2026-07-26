@@ -1,12 +1,22 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link'; // Imported for path routing
 import CategoryFilter from './CategoryFilter';
 import { getAvatarUrl } from '@/utils/helpers';
 import ReportModal from './ReportModal';
 import CommentsModal from './CommentsModal';
+import { createClient } from '@/utils/supabase/client';
 
 const LIMIT = 10;
+
+// Makes a non-<button> control (a plain div) operable via keyboard —
+// Enter/Space triggers the same action a mouse click would.
+const onInteractionKeyDown = (handler) => (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    handler();
+  }
+};
 
 export default function PostFeed() {
   const [posts, setPosts] = useState([]);
@@ -17,14 +27,14 @@ export default function PostFeed() {
   const [hasMore, setHasMore] = useState(true);
   const [activeCommentPost, setActiveCommentPost] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null);
+  const supabaseRef = useRef(createClient());
 
   useEffect(() => {
     const fetchUserUuid = async () => {
       try {
-        const { createClient } = await import('@/utils/supabase/client');
-        const supabase = createClient();
+        const supabase = supabaseRef.current;
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (user) {
           setCurrentUserId(user.id);
         }
@@ -123,6 +133,37 @@ export default function PostFeed() {
     fetchPosts(page, selectedCategory);
   }, [page, selectedCategory]);
 
+  // Live-append posts other users create, so the feed matches the "live
+  // updates" behavior the rest of the app already has for DMs (MessagesPanel).
+  // The realtime payload only carries the raw `posts` row (no joined
+  // profile/category/count data), so we re-fetch page 1 and pull the
+  // matching post out of that response instead of rendering the raw row.
+  useEffect(() => {
+    const supabase = supabaseRef.current;
+    const channel = supabase
+      .channel('posts-feed')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, async (payload) => {
+        if (selectedCategory && payload.new.category_id !== selectedCategory) return;
+        if (payload.new.user_id === currentUserId) return; // already shown optimistically via onPostCreated's refetch
+
+        try {
+          const url = `/api/posts?page=1${selectedCategory ? `&categoryId=${selectedCategory}` : ''}`;
+          const res = await fetch(url);
+          const data = await res.json();
+          const newPost = Array.isArray(data) ? data.find(p => p.id === payload.new.id) : null;
+
+          if (newPost) {
+            setPosts(prev => prev.find(p => p.id === newPost.id) ? prev : [newPost, ...prev]);
+          }
+        } catch (err) {
+          console.error('Failed to hydrate realtime post:', err);
+        }
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [selectedCategory, currentUserId]);
+
   return (
     <div className="feed-container">
       <CategoryFilter onSelect={handleCategorySelect} />
@@ -197,42 +238,63 @@ export default function PostFeed() {
                 </small>
                 
                 <div className="post-interactions">
-                  <div 
-                    className="interaction-item" 
+                  <div
+                    className="interaction-item"
                     onClick={() => handleLike(post)}
+                    onKeyDown={onInteractionKeyDown(() => handleLike(post))}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={hasLiked}
+                    aria-label={hasLiked ? 'Unlike post' : 'Like post'}
                     style={{ cursor: 'pointer' }}
                   >
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         color: hasLiked ? '#ff4b4b' : 'inherit',
                         transition: 'color 0.2s ease'
                       }}
                     >
                       {hasLiked ? '❤️' : '🤍'}
-                    </span> 
+                    </span>
                     <span className="like-count">
                       {post.likes?.[0]?.count || 0}
                     </span>
                   </div>
-                  
-                  <div className="interaction-item" onClick={() => setActiveCommentPost(post)} style={{ cursor: 'pointer' }}>
+
+                  <div
+                    className="interaction-item"
+                    onClick={() => setActiveCommentPost(post)}
+                    onKeyDown={onInteractionKeyDown(() => setActiveCommentPost(post))}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="View comments"
+                    style={{ cursor: 'pointer' }}
+                  >
                     <span>💬</span> {post.comments?.[0]?.count || 0}
                   </div>
-                  
+
                   {isMyPost ? (
-                    <div 
-                      className="interaction-item delete-trigger action-right" 
+                    <div
+                      className="interaction-item delete-trigger action-right"
                       onClick={() => handleDelete(post.id)}
+                      onKeyDown={onInteractionKeyDown(() => handleDelete(post.id))}
+                      role="button"
+                      tabIndex={0}
                       title="Delete your post"
+                      aria-label="Delete your post"
                       style={{ cursor: 'pointer', color: '#dc2626' }}
                     >
                       <span>🗑️</span>
                     </div>
                   ) : (
-                    <div 
-                      className="interaction-item report-trigger action-right" 
+                    <div
+                      className="interaction-item report-trigger action-right"
                       onClick={() => setReportingPost(post)}
+                      onKeyDown={onInteractionKeyDown(() => setReportingPost(post))}
+                      role="button"
+                      tabIndex={0}
                       title="Report this post"
+                      aria-label="Report this post"
                       style={{ cursor: 'pointer' }}
                     >
                       <span>⚠️</span>

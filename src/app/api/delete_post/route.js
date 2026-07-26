@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import { dbErrorResponse } from '@/utils/apiError';
 
 export async function DELETE(req) {
   try {
@@ -18,7 +19,17 @@ export async function DELETE(req) {
       return NextResponse.json({ error: 'Missing post ID' }, { status: 400 });
     }
 
-    // 2. Delete the post (Matches post ID AND current user's ID)
+    // 2. Look up the post's image (if any) before deleting the row, so we
+    // can clean it up from Storage too — otherwise it stays publicly
+    // reachable forever after the post is gone.
+    const { data: existingPost } = await supabase
+      .from('posts')
+      .select('image_url')
+      .eq('id', postId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    // 3. Delete the post (Matches post ID AND current user's ID)
     const { error: deleteError } = await supabase
       .from('posts')
       .delete()
@@ -27,9 +38,16 @@ export async function DELETE(req) {
 
     if (deleteError) throw deleteError;
 
+    if (existingPost?.image_url) {
+      const path = existingPost.image_url.split('/posts/').pop();
+      if (path) {
+        const { error: storageError } = await supabase.storage.from('posts').remove([path]);
+        if (storageError) console.error('Failed to remove post image from Storage:', storageError);
+      }
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Delete Route Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorResponse(error);
   }
 }

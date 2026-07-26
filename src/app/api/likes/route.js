@@ -1,10 +1,11 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import { isValidUUID, dbErrorResponse } from '@/utils/apiError';
 
 export async function POST(req) {
   try {
     const supabase = await createClient();
-    
+
     // 1. Verify the user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
@@ -15,6 +16,9 @@ export async function POST(req) {
     const { post_id } = await req.json();
     if (!post_id) {
       return NextResponse.json({ error: 'Missing post_id' }, { status: 400 });
+    }
+    if (!isValidUUID(post_id)) {
+      return NextResponse.json({ error: 'Invalid post_id.' }, { status: 400 });
     }
 
     // 3. Call the Postgres function we created in the database
@@ -27,7 +31,6 @@ export async function POST(req) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Like toggle error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorResponse(error);
   }
 }

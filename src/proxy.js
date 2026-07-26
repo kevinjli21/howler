@@ -26,15 +26,27 @@ export async function proxy(request) {
             request,
           })
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, {
+              ...options,
+              httpOnly: true,
+              secure: process.env.NODE_ENV === 'production',
+            })
           )
         },
       },
     }
   )
 
-  // Token refresh poke
-  const { data: { user } } = await supabase.auth.getUser()
+  // Token refresh poke. A tampered/malformed session cookie can throw here
+  // (rather than just returning an auth error) — treat that the same as
+  // "no user" instead of crashing the middleware for every request.
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data?.user ?? null;
+  } catch {
+    user = null;
+  }
 
   if (request.nextUrl.pathname.startsWith('/api/')) {
     try {

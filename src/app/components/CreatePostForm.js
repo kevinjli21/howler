@@ -41,22 +41,26 @@ export default function CreatePostForm({ onPostCreated, onCancel }) {
     formData.append('category_id', selectedCategoryId);
     if (file) formData.append('image', file);
 
-    const res = await fetch('/api/posts', { method: 'POST', body: formData });
-    
-    if (!res.ok) {
-      const errorData = await res.json();
-      setError(errorData.error || 'Failed to post.');
-      setLoading(false);
-      return;
-    }
+    try {
+      const res = await fetch('/api/posts', { method: 'POST', body: formData });
 
-    setLoading(false);
-    onPostCreated();
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        setError(errorData.error || 'Failed to post.');
+        return;
+      }
+
+      onPostCreated();
+    } catch (err) {
+      setError('Could not reach the server. Check your connection and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="post-form">
-      {error && <p className="error-message">{error}</p>}
+      {error && <p className="error-message" role="alert" aria-live="polite">{error}</p>}
 
       <h2>Create a Post</h2>
       <textarea

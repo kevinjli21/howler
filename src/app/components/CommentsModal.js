@@ -10,6 +10,15 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Close modal on Escape key press (matches ReportModal's behavior)
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
   const fetchComments = async () => {
     try {
       const res = await fetch(`/api/comments?postId=${post.id}`);
@@ -124,7 +133,13 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
 
   return (
     <div className="expanded-modal-overlay" onClick={onClose}>
-      <div className="expanded-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="expanded-modal-container"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Post comments"
+      >
         
         {/* LEFT COLUMN: Media & Content Focus */}
         <div className="expanded-modal-media-side">

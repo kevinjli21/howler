@@ -8,7 +8,10 @@ export async function GET(request) {
   if (!query) return NextResponse.json({ profiles: [], posts: [] });
 
   const supabase = await createClient();
-  const searchKeyword = `%${query}%`;
+  // Escape ilike wildcards so a literal '%' or '_' in the user's query is
+  // matched literally instead of acting as a SQL wildcard.
+  const escapedQuery = query.replace(/[%_]/g, (c) => `\\${c}`);
+  const searchKeyword = `%${escapedQuery}%`;
 
   const [profilesRes, postsRes] = await Promise.all([
     // 1. Search User Profiles

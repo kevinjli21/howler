@@ -9,8 +9,14 @@ export async function GET(request) {
 
   if (code) {
     const supabase = await createClient()
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
-    
+    let data, error;
+    try {
+      ({ data, error } = await supabase.auth.exchangeCodeForSession(code));
+    } catch (err) {
+      console.error('exchangeCodeForSession failed:', err);
+      return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+    }
+
     if (!error && data.user) {
       const user = data.user;
       

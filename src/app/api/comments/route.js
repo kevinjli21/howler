@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { AllProfanity } from 'allprofanity';
 import config from '@/utils/allprofanity/allprofanity.config.json';
+import { isValidUUID, dbErrorResponse } from '@/utils/apiError';
 
 const MAX_COMMENT_LIMIT = 280;
 
@@ -11,6 +12,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('postId');
     if (!postId) return NextResponse.json({ error: 'Missing postId' }, { status: 400 });
+    if (!isValidUUID(postId)) return NextResponse.json({ error: 'Invalid postId.' }, { status: 400 });
 
     const supabase = await createClient();
     const { data, error } = await supabase
@@ -25,7 +27,7 @@ export async function GET(request) {
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorResponse(error);
   }
 }
 
@@ -39,6 +41,7 @@ export async function POST(req) {
     const { post_id, content, parent_id } = await req.json();
     const cleanContent = content?.trim() || '';
 
+    if (!isValidUUID(post_id)) return NextResponse.json({ error: 'Invalid post_id.' }, { status: 400 });
     if (!cleanContent) return NextResponse.json({ error: 'Comment cannot be empty.' }, { status: 400 });
     if (cleanContent.length > MAX_COMMENT_LIMIT) {
       return NextResponse.json({ error: `Comment must be under ${MAX_COMMENT_LIMIT} characters.` }, { status: 400 });
@@ -63,7 +66,7 @@ export async function POST(req) {
     if (error) throw error;
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorResponse(error);
   }
 }
 
@@ -86,6 +89,6 @@ export async function DELETE(request) {
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return dbErrorResponse(error);
   }
 }
