@@ -41,8 +41,16 @@ export async function DELETE(req) {
     if (existingPost?.image_url) {
       const path = existingPost.image_url.split('/posts/').pop();
       if (path) {
-        const { error: storageError } = await supabase.storage.from('posts').remove([path]);
-        if (storageError) console.error('Failed to remove post image from Storage:', storageError);
+        const { data: removeData, error: storageError } = await supabase.storage.from('posts').remove([path]);
+        if (storageError) {
+          console.error('Failed to remove post image from Storage:', storageError);
+        } else if (!removeData || removeData.length === 0) {
+          // Supabase Storage doesn't error when RLS silently blocks a delete —
+          // it just returns an empty array, the same silent-no-op shape as a
+          // filtered DB delete matching zero rows. Surface it loudly here so
+          // an orphaned-image regression doesn't go unnoticed the way this one did.
+          console.error(`Storage remove() returned 0 files removed for path "${path}" — check the 'posts' bucket's DELETE RLS policy.`);
+        }
       }
     }
 
