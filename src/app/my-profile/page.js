@@ -294,7 +294,7 @@ export default function MyProfile() {
                             {loadingActivity ? (
                                 <p style={{ textAlign: 'center', color: '#64748b' }}>Loading your posts...</p>
                             ) : myOwnPosts.length === 0 ? (
-                                <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '2rem' }}>You haven't posted anything yet!</p>
+                                <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '2rem' }}>You haven&apos;t posted anything yet!</p>
                             ) : (
                                 myOwnPosts.map(post => {
                                     const hasLiked = Array.isArray(post.user_has_liked) && post.user_has_liked.length > 0;
@@ -350,7 +350,7 @@ export default function MyProfile() {
                             {loadingLikes ? (
                                 <p style={{ textAlign: 'center', color: '#64748b' }}>Loading liked posts...</p>
                             ) : likedPosts.length === 0 ? (
-                                <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '2rem' }}>You haven't liked any posts yet!</p>
+                                <p style={{ textAlign: 'center', color: '#94a3b8', marginTop: '2rem' }}>You haven&apos;t liked any posts yet!</p>
                             ) : (
                                 likedPosts.map(post => {
                                     const authorUsername = post.profiles?.username || '';

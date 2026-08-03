@@ -12,25 +12,24 @@ function SearchContent() {
     const searchParams = useSearchParams();
     const { user: backendUser } = useAuth();
     const query = searchParams.get('q');
-    const [results, setResults] = useState({ profiles: [], posts: [] });
-    const [loading, setLoading] = useState(true);
+    const [results, setResults] = useState({ profiles: [], posts: [], forQuery: null });
     const [activeCommentPost, setActiveCommentPost] = useState(null);
     const [reportingPost, setReportingPost] = useState(null);
+    const loading = !!query && results.forQuery !== query;
 
     useEffect(() => {
-        if (query) {
-            setLoading(true);
-            fetch(`/api/search?q=${encodeURIComponent(query)}`)
-                .then(res => res.json())
-                .then(data => {
-                    setResults(data);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    console.error("Search failed", err);
-                    setLoading(false);
-                });
-        }
+        if (!query) return;
+        let ignore = false;
+        fetch(`/api/search?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!ignore) setResults({ ...data, forQuery: query });
+            })
+            .catch(err => {
+                console.error("Search failed", err);
+                if (!ignore) setResults(prev => ({ ...prev, forQuery: query }));
+            });
+        return () => { ignore = true; };
     }, [query]);
 
     const handleSearchPostLike = async (post) => {
@@ -167,7 +166,7 @@ function SearchContent() {
                                         )}
                                     </>
                                 ) : (
-                                    <p className="no-results-text">No posts found containing "{query}".</p>
+                                    <p className="no-results-text">No posts found containing &quot;{query}&quot;.</p>
                                 )
                             )}
                         </div>
