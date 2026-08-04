@@ -156,6 +156,9 @@ export default function CommentsModal({ post, currentUserId, onClose }) {
               <Link href={authorProfileLink} onClick={onClose} style={{ textDecoration: 'none', color: 'inherit' }}>
                 <span style={{ cursor: 'pointer', color: '#64748b' }}>@{post.profiles?.username}</span>
               </Link>
+              {post.profiles?.campus?.name && (
+                <span className="post-campus-badge">{post.profiles.campus.name}</span>
+              )}
             </div>
             {post.categories?.category_name && (
               <span 

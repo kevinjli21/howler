@@ -317,6 +317,9 @@ export default function MyProfile() {
                                                 />
                                                 <strong>{backendUser.full_name}</strong>
                                                 <span style={{ color: '#64748b', marginLeft: '0.25rem', fontSize: '0.85rem' }}>@{backendUser.username}</span>
+                                                {backendUser.campus?.name && (
+                                                    <span className="post-campus-badge">{backendUser.campus.name}</span>
+                                                )}
                                             </div>
 
                                             <p style={{ margin: '0.5rem 0', color: '#0f172a', lineBreak: 'anywhere' }}>{post.content}</p>
@@ -387,6 +390,9 @@ export default function MyProfile() {
                                                                 @{post.profiles.username}
                                                             </span>
                                                         </Link>
+                                                    )}
+                                                    {post.profiles?.campus?.name && (
+                                                        <span className="post-campus-badge">{post.profiles.campus.name}</span>
                                                     )}
                                                 </h3>
                                             </div>

@@ -125,6 +125,9 @@ function SearchContent() {
                                                                     <span className="post-username"> @{post.profiles.username}</span>
                                                                 </Link>
                                                             )}
+                                                            {post.profiles?.campus?.name && (
+                                                                <span className="post-campus-badge">{post.profiles.campus.name}</span>
+                                                            )}
                                                         </h3>
                                                     </div>
                                                     <p>{post.content}</p>

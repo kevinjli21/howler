@@ -32,7 +32,7 @@ export async function GET(request) {
         image_url, 
         posted_at,
         user_id,
-        profiles (full_name, avatar_url, username),
+        profiles (full_name, avatar_url, username, campus:campus_id(name)),
         categories (category_name, color),
         comments (count),
         likes:likes (count)

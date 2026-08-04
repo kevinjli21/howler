@@ -29,7 +29,7 @@ export async function GET(request) {
         content, 
         image_url, 
         posted_at, 
-        profiles(full_name, username, avatar_url),
+        profiles(full_name, username, avatar_url, campus:campus_id(name)),
         categories(category_name, color)
       `)
       .ilike('content', searchKeyword)

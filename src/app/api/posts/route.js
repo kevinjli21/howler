@@ -34,7 +34,7 @@ export async function GET(request) {
       .from('posts')
       .select(`
         *,
-        profiles (full_name, avatar_url, username),
+        profiles (full_name, avatar_url, username, campus:campus_id(name)),
         categories (category_name, color),
         comments(count),
         likes:likes(count),
