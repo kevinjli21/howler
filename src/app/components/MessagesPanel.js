@@ -16,6 +16,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   const [searching, setSearching] = useState(false);
   const [readTimes, setReadTimes] = useState({});
   const [deleting, setDeleting] = useState(false);
+  const [, setClockTick] = useState(0);
   const messagesEndRef = useRef(null);
   const messageInputRef = useRef(null);
   const supabaseRef = useRef(createClient());
@@ -24,6 +25,13 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Keeps relative timestamps ("5m", "1h") fresh in the conversation list
+  // even when no new messages arrive to trigger a re-render.
+  useEffect(() => {
+    const interval = setInterval(() => setClockTick(t => t + 1), 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const stored = {};
@@ -198,6 +206,18 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
     return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
+  const formatRelativeTime = (ts) => {
+    const diffSec = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+    if (diffSec < 60) return 'now';
+    const diffMin = Math.floor(diffSec / 60);
+    if (diffMin < 60) return `${diffMin}m`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h`;
+    const diffDay = Math.floor(diffHr / 24);
+    if (diffDay < 7) return `${diffDay}d`;
+    return new Date(ts).toLocaleDateString([], { month: 'short', day: 'numeric' });
+  };
+
   if (selectedConvo) {
     return (
       <div className="dm-panel-chat">
@@ -334,7 +354,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
             </div>
             <div className="dm-convo-right">
               {convo.last_message_at && (
-                <span className="dm-convo-time">{formatDate(convo.last_message_at)}</span>
+                <span className="dm-convo-time">{formatRelativeTime(convo.last_message_at)}</span>
               )}
               {isUnread(convo) && <span className="dm-unread-dot" />}
             </div>
