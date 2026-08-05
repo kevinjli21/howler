@@ -6,40 +6,21 @@ import CommentsModal from '../../components/CommentsModal';
 import Sidebar from '../../components/Sidebar';
 import { getAvatarUrl } from '@/utils/helpers';
 import ReportModal from '../../components/ReportModal';
+import { useAuth } from '../../components/AuthContext';
 
 export default function OtherProfilePage() {
   const { username } = useParams();
   const router = useRouter();
+  const { user: navbarUser } = useAuth();
+  const currentUserId = navbarUser?.id ?? null;
   const [userProfile, setUserProfile] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState(null);
-  const [navbarUser, setNavbarUser] = useState(null);
   const [activeCommentPost, setActiveCommentPost] = useState(null);
   const [reportingPost, setReportingPost] = useState(null);
   const [dmLoading, setDmLoading] = useState(false);
 
   useEffect(() => {
-    const fetchCurrentSession = async () => {
-      try {
-        const { createClient } = await import('@/utils/supabase/client');
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (user) {
-          setCurrentUserId(user.id);
-
-          const profileRes = await fetch('/api/myprofile');
-          if (profileRes.ok) {
-            const profileData = await profileRes.json();
-            setNavbarUser(profileData);
-          }
-        }
-      } catch (err) {
-        console.error("Auth initialization check failed", err);
-      }
-    };
-
     const fetchPublicProfile = async () => {
       try {
         const res = await fetch(`/api/profile?username=${encodeURIComponent(username)}`);
@@ -58,7 +39,6 @@ export default function OtherProfilePage() {
       }
     };
 
-    fetchCurrentSession();
     if (username) fetchPublicProfile();
   }, [username]);
 
@@ -84,6 +64,23 @@ export default function OtherProfilePage() {
       console.error('Failed to open DM:', err);
     } finally {
       setDmLoading(false);
+    }
+  };
+
+  const handleDeletePost = async (postId) => {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+
+    setUserPosts(prev => prev.filter(post => post.id !== postId));
+
+    try {
+      const res = await fetch(`/api/delete_post?id=${postId}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Failed to delete post');
+    } catch (error) {
+      console.error(error);
+      alert('Could not delete post. Please try again.');
     }
   };
 
@@ -269,6 +266,7 @@ export default function OtherProfilePage() {
                       {isMyPost ? (
                         <div
                           className="interaction-item delete-trigger action-right"
+                          onClick={() => handleDeletePost(post.id)}
                           title="Delete your post"
                           style={{ cursor: 'pointer', color: '#dc2626' }}
                         >

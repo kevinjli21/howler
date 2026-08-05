@@ -6,6 +6,7 @@ import { getAvatarUrl } from '@/utils/helpers';
 import ReportModal from './ReportModal';
 import CommentsModal from './CommentsModal';
 import { createClient } from '@/utils/supabase/client';
+import { useAuth } from './AuthContext';
 
 const LIMIT = 10;
 
@@ -26,25 +27,9 @@ export default function PostFeed() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [hasMore, setHasMore] = useState(true);
   const [activeCommentPost, setActiveCommentPost] = useState(null);
-  const [currentUserId, setCurrentUserId] = useState(null);
+  const { user: authUser } = useAuth();
+  const currentUserId = authUser?.id ?? null;
   const supabaseRef = useRef(createClient());
-
-  useEffect(() => {
-    const fetchUserUuid = async () => {
-      try {
-        const supabase = supabaseRef.current;
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (user) {
-          setCurrentUserId(user.id);
-        }
-      } catch (err) {
-        console.error("Failed to fetch user UUID on client side:", err);
-      }
-    };
-
-    fetchUserUuid();
-  }, []);
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
