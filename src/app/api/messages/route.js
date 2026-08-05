@@ -66,6 +66,21 @@ export async function POST(request) {
 
     if (error) throw error;
 
+    // Keep the conversation's last_message_at in sync so the inbox list
+    // sorts and displays by actual recent activity, not creation time.
+    const { data: touched, error: touchError } = await supabase
+      .from('conversations')
+      .update({ last_message_at: message.created_at })
+      .eq('id', conversation_id)
+      .select('id');
+    if (touchError) {
+      console.error('Failed to update conversation last_message_at:', touchError);
+    } else if (!touched || touched.length === 0) {
+      // Supabase doesn't error when RLS silently blocks an update — it just
+      // matches 0 rows. Surface it loudly so this doesn't regress unnoticed.
+      console.error(`conversations UPDATE matched 0 rows for id "${conversation_id}" — check the 'conversations' table's UPDATE RLS policy.`);
+    }
+
     return NextResponse.json(message);
   } catch (error) {
     return dbErrorResponse(error);
