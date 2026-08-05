@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
+import { dbErrorResponse } from '@/utils/apiError';
 
 export async function GET() {
   const supabase = await createClient();
@@ -77,4 +78,52 @@ export async function POST(request) {
   }
 
   return NextResponse.json({ conversation_id: data });
+}
+
+export async function DELETE(request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const conversationId = searchParams.get('conversation_id');
+    if (!conversationId) return NextResponse.json({ error: 'conversation_id is required' }, { status: 400 });
+
+    const { data: participation } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id')
+      .eq('conversation_id', conversationId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!participation) return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+
+    // Explicitly clear child rows first — the conversation row must not
+    // survive with an orphaned messages/participants trail, and we can't
+    // rely on ON DELETE CASCADE being set on these FKs.
+    const { error: msgError } = await supabase
+      .from('direct_messages')
+      .delete()
+      .eq('conversation_id', conversationId);
+    if (msgError) throw msgError;
+
+    const { error: partError } = await supabase
+      .from('conversation_participants')
+      .delete()
+      .eq('conversation_id', conversationId);
+    if (partError) throw partError;
+
+    const { error: convoError } = await supabase
+      .from('conversations')
+      .delete()
+      .eq('id', conversationId);
+    if (convoError) throw convoError;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return dbErrorResponse(error);
+  }
 }

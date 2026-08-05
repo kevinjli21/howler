@@ -2007,6 +2007,30 @@ body {
 .dm-other-info {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.dm-delete-btn {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 6px 8px;
+  border-radius: 8px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.dm-delete-btn:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.dm-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .dm-other-name {

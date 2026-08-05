@@ -15,6 +15,7 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
   const [searchResults, setSearchResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const [readTimes, setReadTimes] = useState({});
+  const [deleting, setDeleting] = useState(false);
   const messagesEndRef = useRef(null);
   const messageInputRef = useRef(null);
   const supabaseRef = useRef(createClient());
@@ -162,6 +163,25 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
     }
   };
 
+  const deleteConversation = async (convo) => {
+    if (!convo || deleting) return;
+    if (!window.confirm('Delete this conversation? This cannot be undone.')) return;
+
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/conversations?conversation_id=${convo.id}`, { method: 'DELETE' });
+      if (res.ok) {
+        localStorage.removeItem(`dm_last_read_${convo.id}`);
+        setConversations(prev => prev.filter(c => c.id !== convo.id));
+        setSelectedConvo(null);
+      }
+    } catch (err) {
+      console.error('Failed to delete conversation:', err);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const handleInputKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) sendMessage(e);
   };
@@ -192,6 +212,14 @@ export default function MessagesPanel({ currentUserId, initialConvo = null }) {
             <span className="dm-other-name">{selectedConvo.other_user?.full_name}</span>
             <span className="dm-other-handle">@{selectedConvo.other_user?.username}</span>
           </div>
+          <button
+            className="dm-delete-btn"
+            onClick={() => deleteConversation(selectedConvo)}
+            disabled={deleting}
+            title="Delete conversation"
+          >
+            🗑️
+          </button>
         </div>
 
         <div className="dm-messages-list">
