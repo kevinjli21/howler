@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2930 1420" width="2930" height="1420" style="color:#1c1730">
+  <defs>
+    <marker id="arrow43" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor" />
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="2930" height="1420" fill="#ffffff" />
+
+  <!-- ROW 1 -->
+
+  <!-- Node 1: UW Student -->
+  <rect x="310" y="95" width="650" height="300" rx="18" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="3" />
+  <text x="635" y="178" font-size="70" text-anchor="middle">🎓</text>
+  <text x="635" y="267" font-size="54" font-weight="700" text-anchor="middle" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">UW Student</text>
+  <text x="635" y="327" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">wants to post a Howl</text>
+
+  <!-- Arrow A -->
+  <line x1="960" y1="245" x2="1180" y2="245" stroke="currentColor" stroke-width="3" marker-end="url(#arrow43)" />
+  <text x="1070" y="215" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.8" font-family="ui-sans-serif, system-ui, Arial, sans-serif">signs in</text>
+
+  <!-- Node 2: Sign-in gate -->
+  <rect x="1180" y="60" width="700" height="370" rx="18" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="3" />
+  <text x="1530" y="163" font-size="64" text-anchor="middle">🔐</text>
+  <text x="1530" y="238" font-size="54" font-weight="700" text-anchor="middle" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Sign-in gate</text>
+  <text x="1530" y="290" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Google (uw.edu) or</text>
+  <text x="1530" y="338" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Microsoft · UW's tenant</text>
+
+  <!-- Arrow B -->
+  <line x1="1880" y1="245" x2="2220" y2="245" stroke="currentColor" stroke-width="3" marker-end="url(#arrow43)" />
+  <text x="2050" y="215" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.8" font-family="ui-sans-serif, system-ui, Arial, sans-serif">session cookie</text>
+
+  <!-- Node 3: Compose -->
+  <rect x="2220" y="95" width="650" height="300" rx="18" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="3" />
+  <text x="2545" y="178" font-size="64" text-anchor="middle">📝</text>
+  <text x="2545" y="267" font-size="54" font-weight="700" text-anchor="middle" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Compose a Howl</text>
+  <text x="2545" y="327" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">text · image · category</text>
+
+  <!-- Wrap connector: row 1 end -> row 2 start -->
+  <line x1="2545" y1="395" x2="2545" y2="500" stroke="currentColor" stroke-width="3" />
+  <line x1="2545" y1="500" x2="310" y2="500" stroke="currentColor" stroke-width="3" />
+  <line x1="310" y1="500" x2="310" y2="577" stroke="currentColor" stroke-width="3" marker-end="url(#arrow43)" />
+  <text x="1427" y="475" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.85" font-family="ui-monospace, Consolas, monospace">POST /api/posts</text>
+
+  <!-- ROW 2 -->
+
+  <!-- Trust & Safety Checkpoint: one unified rectangle -->
+  <text x="720" y="545" font-size="42" font-weight="700" text-anchor="middle" letter-spacing="0.07em" fill="#a2732c" font-family="ui-sans-serif, system-ui, Arial, sans-serif">TRUST &amp; SAFETY CHECKPOINT</text>
+  <rect x="310" y="580" width="820" height="620" rx="24" fill="#a2732c" fill-opacity="0.08" stroke="#a2732c" stroke-width="4" />
+
+  <text x="350" y="743" font-size="64">🚫</text>
+  <text x="440" y="731" font-size="45" font-weight="700" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Profanity filter</text>
+  <text x="440" y="776" font-size="36" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">post &amp; comment text</text>
+
+  <text x="350" y="890" font-size="64">🖼️</text>
+  <text x="440" y="878" font-size="45" font-weight="700" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Vision AI safe-search</text>
+  <text x="440" y="923" font-size="36" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">uploaded images</text>
+
+  <text x="350" y="1037" font-size="64">⏱️</text>
+  <text x="440" y="1025" font-size="45" font-weight="700" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Rate limiter</text>
+  <text x="440" y="1070" font-size="36" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Upstash Redis · per user &amp; IP</text>
+
+  <!-- Reject path -->
+  <line x1="530" y1="1200" x2="370" y2="1265" stroke="currentColor" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#arrow43)" />
+  <text x="370" y="1303" font-size="36" font-style="italic" text-anchor="middle" fill="currentColor" fill-opacity="0.75" font-family="ui-sans-serif, system-ui, Arial, sans-serif">fails a check →</text>
+  <text x="370" y="1348" font-size="36" font-style="italic" text-anchor="middle" fill="currentColor" fill-opacity="0.75" font-family="ui-sans-serif, system-ui, Arial, sans-serif">clear error, nothing crashes</text>
+
+  <!-- Arrow D -->
+  <line x1="1130" y1="890" x2="1322" y2="890" stroke="currentColor" stroke-width="3" marker-end="url(#arrow43)" />
+  <text x="1230" y="860" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.85" font-family="ui-monospace, Consolas, monospace">insert</text>
+
+  <!-- Node: Postgres cylinder -->
+  <path d="M1330,755 L1330,1025 A130,35 0 0 0 1590,1025 L1590,755 A130,35 0 0 1 1330,755 Z" fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="3" />
+  <ellipse cx="1460" cy="755" rx="130" ry="35" fill="none" stroke="currentColor" stroke-width="3" />
+  <text x="1460" y="900" font-size="64" text-anchor="middle">🗄️</text>
+  <text x="1460" y="1105" font-size="54" font-weight="700" text-anchor="middle" fill="currentColor" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Postgres</text>
+  <text x="1460" y="1147" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.7" font-family="ui-sans-serif, system-ui, Arial, sans-serif">Supabase · Row-Level Security</text>
+
+  <!-- Arrow E + fan-out -->
+  <line x1="1590" y1="890" x2="2022" y2="890" stroke="currentColor" stroke-width="3" />
+  <text x="1810" y="860" font-size="39" text-anchor="middle" fill="currentColor" fill-opacity="0.8" font-family="ui-sans-serif, system-ui, Arial, sans-serif">realtime broadcast</text>
+  <circle cx="2030" cy="890" r="9" fill="currentColor" />
+
+  <line x1="2030" y1="890" x2="2098" y2="710" stroke="currentColor" stroke-width="2.5" marker-end="url(#arrow43)" />
+  <line x1="2030" y1="890" x2="2098" y2="890" stroke="currentColor" stroke-width="2.5" marker-end="url(#arrow43)" />
+  <line x1="2030" y1="890" x2="2098" y2="1070" stroke="currentColor" stroke-width="2.5" marker-end="url(#arrow43)" />
+
+  <text x="2152" y="580" font-size="39" font-weight="700" text-anchor="middle" letter-spacing="0.04em" fill="currentColor" fill-opacity="0.85" font-family="ui-sans-serif, system-ui, Arial, sans-serif">OTHER STUDENTS' FEEDS</text>
+
+  <g fill="currentColor" fill-opacity="0.06" stroke="currentColor" stroke-width="2.5">
+    <rect x="2100" y="620" width="105" height="180" rx="16" />
+    <rect x="2100" y="800" width="105" height="180" rx="16" />
+    <rect x="2100" y="980" width="105" height="180" rx="16" />
+  </g>
+  <g fill="currentColor" fill-opacity="0.6" stroke="none">
+    <circle cx="2152" cy="773" r="6" />
+    <circle cx="2152" cy="953" r="6" />
+    <circle cx="2152" cy="1133" r="6" />
+  </g>
+
+  <text x="2152" y="1200" font-size="36" font-style="italic" text-anchor="middle" fill="currentColor" fill-opacity="0.75" font-family="ui-sans-serif, system-ui, Arial, sans-serif">updates instantly — no refresh</text>
+</svg>

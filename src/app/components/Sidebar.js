@@ -2,14 +2,12 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback } from 'react';
 import { getAvatarUrl } from '@/utils/helpers';
-import { createClient } from '@/utils/supabase/client';
 import PostModal from './PostModal';
 import CreatePostForm from './CreatePostForm';
 
 export default function Sidebar({ user, activeNav = '', onPostCreated }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const supabase = createClient();
 
   const computeUnread = useCallback(async () => {
     if (!user?.id) return;
@@ -35,7 +33,7 @@ export default function Sidebar({ user, activeNav = '', onPostCreated }) {
   }, [computeUnread]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await fetch('/api/auth/logout', { method: 'POST' });
     window.location.assign('/');
   };
 

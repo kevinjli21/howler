@@ -2,12 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { createClient } from '@/utils/supabase/client'; 
 
 export default function UserDropdown({ username }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const supabase = createClient(); 
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -20,8 +18,8 @@ export default function UserDropdown({ username }) {
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.assign('/'); 
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.assign('/');
   };
 
   return (
